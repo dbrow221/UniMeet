@@ -1,0 +1,77 @@
+/* Full-page gradient background */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+/* Center content */
+.home-content {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Title */
+.home-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Tagline */
+.home-tagline {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+/* Button container */
+.home-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-light {
+  background: white;
+  color: #4f46e5;
+}
+
+.btn-light:hover {
+  background: #f3f4f6;
+  transform: scale(1.05);
+}
+
+.btn-primary {
+  background: #4338ca;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3730a3;
+  transform: scale(1.05);
+}
+
+/* Footer */
+.home-footer {
+  position: absolute;
+  bottom: 15px;
+  font-size: 0.9rem;
+  color: #e5e7eb;
+}
