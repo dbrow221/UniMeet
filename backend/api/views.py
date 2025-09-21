@@ -3,10 +3,25 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .serializers import UserSerializer, EventSerializer
-from .models import Event
+from .serializers import UserSerializer, EventSerializer, LocationSerializer
+from .models import Event, Location
 from django.db.models import Q
 
+
+
+@api_view(["POST"])
+def create_location(request):
+    serializer = LocationSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
+
+@api_view(['GET'])
+def location_list(request):
+    locations = Location.objects.all()
+    serializer = LocationSerializer(locations, many=True)
+    return Response(serializer.data)
 
 class EventListCreate(generics.ListCreateAPIView):
     serializer_class = EventSerializer
