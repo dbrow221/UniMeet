@@ -22,7 +22,7 @@ function Home() {
         const userId = decoded.user_id;
 
         // Make API call with Authorization header and trailing slash
-        const res = await api.get(`/user/${userId}/`, {
+        const res = await api.get(`api/user/${userId}/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

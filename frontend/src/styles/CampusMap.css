@@ -1,3 +1,7 @@
+body{
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
 
 .map-wrapper {
   padding: 20px;              /* space around the map */
@@ -14,3 +18,10 @@
   width: 100%;
   border-radius: 8px; /* map itself also rounded */
 }
+h1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
