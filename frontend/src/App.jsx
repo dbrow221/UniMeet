@@ -6,6 +6,9 @@ import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import CampusMap from './pages/CampusMap'
+import CreateEvent from './pages/CreateEvent'
+import EventView from './pages/EventView'
+import { Events } from 'leaflet'
 
 function Logout() {
   localStorage.clear()
@@ -36,7 +39,9 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterAndLogout />} />
-        <Route path="/create-event" element={<CampusMap />} />
+        <Route path="/map" element={<CampusMap />} />
+        <Route path='/create-event' element={<CreateEvent/>}/>
+        <Route path='/events' element={<EventView/>}/>
 
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />

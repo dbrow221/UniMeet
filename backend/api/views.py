@@ -6,33 +6,27 @@ from rest_framework.decorators import api_view, permission_classes
 from .serializers import UserSerializer, EventSerializer, LocationSerializer
 from .models import Event, Location
 from django.db.models import Q
+from rest_framework import viewsets
 
-
-
-@api_view(["POST"])
-def create_location(request):
-    serializer = LocationSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
-
-@api_view(['GET'])
-def location_list(request):
-    locations = Location.objects.all()
-    serializer = LocationSerializer(locations, many=True)
-    return Response(serializer.data)
 
 class EventListCreate(generics.ListCreateAPIView):
     serializer_class = EventSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]   # anyone can view
+        return [IsAuthenticated()]  # only logged-in users can create
 
     def get_queryset(self):
         user = self.request.user
-        # Return public events or events created by the logged-in user
-        return Event.objects.filter(Q(is_public=True) | Q(host=user))
+        if user.is_authenticated:
+            # Authenticated users: see public + their own
+            return Event.objects.filter(Q(is_public=True) | Q(host=user))
+        # Anonymous users: only see public events
+        return Event.objects.filter(is_public=True)
 
     def perform_create(self, serializer):
+        # The EventSerializer already handles location duplicates
         serializer.save(host=self.request.user)
 
 
@@ -44,6 +38,36 @@ class EventDelete(generics.DestroyAPIView):
         user = self.request.user
         # Only return events created by the logged-in user
         return Event.objects.filter(host=user)
+
+
+# -------------------------------
+# Create location safely (avoid duplicates)
+# -------------------------------
+@api_view(["POST"])
+def create_location(request):
+    name = request.data.get("name")
+    latitude = request.data.get("latitude")
+    longitude = request.data.get("longitude")
+
+    if not (name and latitude is not None and longitude is not None):
+        return Response({"error": "name, latitude, and longitude are required."}, status=400)
+
+    # Get existing location if exists, otherwise create
+    location, created = Location.objects.get_or_create(
+        name=name,
+        latitude=latitude,
+        longitude=longitude
+    )
+
+    serializer = LocationSerializer(location)
+    return Response(serializer.data, status=201 if created else 200)
+
+
+@api_view(['GET'])
+def location_list(request):
+    locations = Location.objects.all()
+    serializer = LocationSerializer(locations, many=True)
+    return Response(serializer.data)
 
 
 class CreateUserView(generics.CreateAPIView):

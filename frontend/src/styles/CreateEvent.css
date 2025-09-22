@@ -1,0 +1,70 @@
+/* frontend/src/styles/CreateEvent.css */
+
+.create-event {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 2px solid #006400;
+  border-radius: 10px;
+  background-color: #f7f7f7;
+  font-family: Arial, sans-serif;
+}
+
+.create-event h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #006400;
+}
+
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.event-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.event-form input[type="text"],
+.event-form textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.event-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.event-form input[type="checkbox"] {
+  margin-left: 10px;
+  transform: scale(1.2);
+}
+
+.event-form button {
+  padding: 10px 15px;
+  background-color: #006400;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  align-self: flex-start;
+  transition: all 0.2s ease-in-out;
+}
+
+.event-form button:hover {
+  background-color: #004d00;
+  transform: scale(1.05);
+}
+
+.create-event p {
+  font-size: 16px;
+  margin-bottom: 15px;
+}

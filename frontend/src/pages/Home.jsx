@@ -5,6 +5,7 @@ import api from "../api"; // your Axios instance
 import { ACCESS_TOKEN } from "../constants";
 import "../styles/Home.css";
 
+
 function Home() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
@@ -57,7 +58,7 @@ function Home() {
           <Link to="/events" className="btn btn-light">
             View Events
           </Link>
-          <Link to="/create-event" className="btn btn-primary">
+          <Link to="/map" className="btn btn-primary">
             Create Event
           </Link>
         </div>

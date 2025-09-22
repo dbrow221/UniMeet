@@ -1,27 +1,46 @@
-body{
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-}
-
+/* frontend/src/styles/CampusMap.css */
 
 .map-wrapper {
-  padding: 20px;              /* space around the map */
-  border: 2px solid #00467f;  /* UNC Charlotte teal/navy border */
-  border-radius: 12px;        /* rounded corners */
-  background: #f9f9f9;        /* light background */
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* subtle shadow */
-  max-width: 900px;           /* optional max width */
-  margin: 20px auto;          /* center on page */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 .campus-map {
-  height: 500px;
   width: 100%;
-  border-radius: 8px; /* map itself also rounded */
-}
-h1{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  max-width: 900px;
+  height: 600px;
+  margin-bottom: 20px;
+  border: 2px solid #006400;
+  border-radius: 8px;
 }
 
+.selection-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+}
 
+.selection-info p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.select-location-btn {
+  padding: 10px 20px;
+  background-color: #006400;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.select-location-btn:hover {
+  background-color: #004d00;
+  transform: scale(1.05);
+}

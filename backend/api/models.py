@@ -5,9 +5,12 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Location(models.Model):
     name = models.CharField(max_length=100)  # e.g. "Student Union Ballroom"
-    address = models.TextField(blank=True, null=True)  # optional full address
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("name", "latitude", "longitude")
+
 
     def __str__(self):
         return self.name
