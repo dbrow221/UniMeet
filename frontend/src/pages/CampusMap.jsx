@@ -1,4 +1,3 @@
-// frontend/src/components/CampusMap.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
@@ -58,7 +57,16 @@ const CampusMap = () => {
         if (!res.ok) throw new Error(await res.text());
         return res.json();
       })
-      .then((data) => setEvents(Array.isArray(data) ? data.filter(e => e.is_public) : []))
+      .then((data) => {
+        if (!Array.isArray(data)) return setEvents([]);
+        // Map to include host_details and location_details if not returned already
+        const mappedEvents = data.map(e => ({
+          ...e,
+          host_details: e.host_details || e.host,
+          location_details: e.location_details || e.location
+        }));
+        setEvents(mappedEvents.filter(e => e.is_public));
+      })
       .catch(err => console.error("Error loading events:", err));
   }, []);
 
@@ -106,13 +114,18 @@ const CampusMap = () => {
               body: JSON.stringify(building),
             });
 
+            let savedLocation;
             if (response.ok) {
-              const savedLocation = await response.json(); // includes id
-              setSelected(savedLocation); // pass location with ID to CreateEvent
+              savedLocation = await response.json(); // includes id
             } else {
               console.error("Failed to save location:", await response.text());
-              setSelected(building); // fallback
+              savedLocation = building; // fallback
             }
+            // Attach id safely so CreateEvent knows location_id
+            setSelected({
+              ...savedLocation,
+              id: savedLocation.id || null
+            });
           } catch (err) {
             console.error("Network error saving location:", err);
             setSelected(building); // fallback
@@ -140,12 +153,12 @@ const CampusMap = () => {
         {events.map(event => (
           <Marker
             key={event.id}
-            position={[event.location.latitude, event.location.longitude]}
+            position={[event.location_details.latitude, event.location_details.longitude]}
           >
             <Popup>
               <b>{event.name}</b><br/>
               {event.details}<br/>
-              📍 {event.location.name}
+              📍 {event.location_details.name}
             </Popup>
           </Marker>
         ))}

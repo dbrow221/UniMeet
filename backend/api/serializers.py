@@ -22,11 +22,11 @@ class LocationSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    # Read-only nested details
-    location = LocationSerializer(read_only=True)
-    host = UserSerializer(read_only=True)
+    # Read-only nested objects for frontend
+    location_details = LocationSerializer(source="location", read_only=True)
+    host_details = UserSerializer(source="host", read_only=True)
 
-    # Write-only IDs
+    # Write-only IDs for creation
     location_id = serializers.PrimaryKeyRelatedField(
         queryset=Location.objects.all(),
         source="location",
@@ -40,7 +40,21 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = "__all__"
+        fields = [
+            "id",
+            "name",
+            "details",
+            "posted_date",
+            "is_public",
+            "location_details",
+            "host_details",
+            "location_id",
+            "host_id",
+        ]
 
     def create(self, validated_data):
+        """
+        Create Event instance using validated_data.
+        'location' and 'host' are set via location_id and host_id automatically.
+        """
         return Event.objects.create(**validated_data)

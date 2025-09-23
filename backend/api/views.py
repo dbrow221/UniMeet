@@ -3,10 +3,10 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from django.db.models import Q
+
 from .serializers import UserSerializer, EventSerializer, LocationSerializer
 from .models import Event, Location
-from django.db.models import Q
-from rest_framework import viewsets
 
 
 class EventListCreate(generics.ListCreateAPIView):
@@ -20,14 +20,19 @@ class EventListCreate(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            # Authenticated users: see public + their own
+            # Authenticated users: see public + their own events
             return Event.objects.filter(Q(is_public=True) | Q(host=user))
-        # Anonymous users: only see public events
+        # Anonymous users: only public events
         return Event.objects.filter(is_public=True)
 
     def perform_create(self, serializer):
-        # The EventSerializer already handles location duplicates
-        serializer.save(host=self.request.user)
+        """
+        ✅ Instead of forcing host=self.request.user,
+        we respect `host_id` passed in the payload.
+        Your EventSerializer maps host_id → host, so we
+        can just call save() normally.
+        """
+        serializer.save()
 
 
 class EventDelete(generics.DestroyAPIView):
@@ -36,12 +41,15 @@ class EventDelete(generics.DestroyAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        # Only return events created by the logged-in user
+        # Only events created by the logged-in user can be deleted
         return Event.objects.filter(host=user)
 
 
 # -------------------------------
 # Create location safely (avoid duplicates)
+# -------------------------------
+# -------------------------------
+# Create location safely (avoid duplicates + MultipleObjectsReturned)
 # -------------------------------
 @api_view(["POST"])
 def create_location(request):
@@ -50,20 +58,33 @@ def create_location(request):
     longitude = request.data.get("longitude")
 
     if not (name and latitude is not None and longitude is not None):
-        return Response({"error": "name, latitude, and longitude are required."}, status=400)
+        return Response(
+            {"error": "name, latitude, and longitude are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    # Get existing location if exists, otherwise create
-    location, created = Location.objects.get_or_create(
+    # Try to find an existing location first
+    location = Location.objects.filter(
         name=name,
         latitude=latitude,
-        longitude=longitude
-    )
+        longitude=longitude,
+    ).first()
+
+    if not location:
+        location = Location.objects.create(
+            name=name,
+            latitude=latitude,
+            longitude=longitude,
+        )
+        status_code = status.HTTP_201_CREATED
+    else:
+        status_code = status.HTTP_200_OK
 
     serializer = LocationSerializer(location)
-    return Response(serializer.data, status=201 if created else 200)
+    return Response(serializer.data, status=status_code)
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def location_list(request):
     locations = Location.objects.all()
     serializer = LocationSerializer(locations, many=True)
@@ -77,13 +98,16 @@ class CreateUserView(generics.CreateAPIView):
 
 
 # -------------------------------
-# New view to fetch user info by ID
+# Fetch user info by ID
 # -------------------------------
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_by_id(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         return Response({"id": user.id, "username": user.username})
     except User.DoesNotExist:
-        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"detail": "User not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )

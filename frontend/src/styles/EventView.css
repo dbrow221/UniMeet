@@ -1,7 +1,7 @@
-/* frontend/src/styles/Events.css */
+/* frontend/src/styles/EventView.css */
 
 .events-wrapper {
-  max-width: 800px;
+  max-width: 900px;
   margin: 40px auto;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -10,7 +10,8 @@
 .events-wrapper h1 {
   text-align: center;
   color: #006400;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
+  font-size: 2rem;
 }
 
 .events-list {
@@ -18,27 +19,57 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 25px;
 }
 
 .event-item {
   border: 2px solid #006400;
   border-radius: 10px;
-  padding: 15px;
+  padding: 20px;
   background-color: #f7f7f7;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .event-item:hover {
   transform: scale(1.02);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .event-item h2 {
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   color: #004d00;
+  font-size: 1.5rem;
 }
 
 .event-item p {
-  margin: 5px 0;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+/* Delete button styling */
+.delete-event-btn {
+  margin-top: 12px;
+  padding: 8px 14px;
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.delete-event-btn:hover {
+  background-color: #e60000;
+  transform: scale(1.05);
+}
+
+/* Mini map container */
+.event-mini-map {
+  margin-top: 12px;
+  height: 180px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ccc;
 }
