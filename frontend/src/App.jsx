@@ -1,7 +1,7 @@
 import React from 'react'
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
 import Login from './pages/login'
-import Register from "./pages/Register"
+import Register from "./pages/register"
 import Home from "./pages/Home"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
@@ -10,6 +10,7 @@ import CreateEvent from './pages/CreateEvent'
 import EventView from './pages/EventView'
 import { Events } from 'leaflet'
 import Header from './components/Header'
+import Profile from './pages/Profile'
 
 function Logout() {
   localStorage.clear()
