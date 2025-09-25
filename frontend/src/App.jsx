@@ -44,6 +44,7 @@ function App() {
         <Route path="/map" element={<CampusMap />} />
         <Route path='/create-event' element={<CreateEvent/>}/>
         <Route path='/events' element={<EventView/>}/>
+        <Route path='/profile' element={<Profile/>}/>
 
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />

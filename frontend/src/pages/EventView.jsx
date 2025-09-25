@@ -49,7 +49,7 @@ const EventView = () => {
       try {
         const decoded = jwtDecode(token);
         console.log(decoded);
-        setCurrentID(decoded.user_id); // store username
+        setCurrentID(Number(decoded.user_id)); // store username
       } catch (err) {
         console.error("Failed to decode token:", err);
       }
@@ -129,12 +129,13 @@ const EventView = () => {
             
             {/* ✅ Show delete button only if current user is the host */}
 
-           if {currentID && event.host_details?.id === currentID && (
+           {currentID && event.host_details?.id === currentID && (
               <button
                 onClick={() => handleDelete(event.id)}
                 className="delete-event-btn"
               >
-                Delete Event
+                
+                Delete Event  
               </button>
             )}
           </li>
@@ -144,4 +145,4 @@ const EventView = () => {
   );
 };
 
-export default EventView;
+export default EventView; 
