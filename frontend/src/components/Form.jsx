@@ -8,12 +8,14 @@ import LoadingIndicator from "../components/LoadingIndicator";
 function Form({ route, method }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        setLoading(true)
         e.preventDefault();
+        setLoading(true);
+        setErrorMessage(""); // clear old errors
         try {
             const res = await api.post(route, { username, password });
             if (method === "login") {
@@ -24,9 +26,26 @@ function Form({ route, method }) {
                 navigate("/login");
             }
         } catch (error) {
-            alert(error);
+            if (error.response) {
+                // Server responded with status code outside 2xx
+                if (error.response.status === 400) {
+                    setErrorMessage("Invalid input. Please check your username and password.");
+                } else if (error.response.status === 401) {
+                    setErrorMessage("Incorrect username or password.");
+                } else if (error.response.status === 409) {
+                    setErrorMessage("That username is already taken.");
+                } else {
+                    setErrorMessage("Something went wrong. Please try again later.");
+                }
+            } else if (error.request) {
+                // Request made but no response
+                setErrorMessage("No response from server. Please check your connection.");
+            } else {
+                // Something else happened
+                setErrorMessage("An unexpected error occurred.");
+            }
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
@@ -48,7 +67,8 @@ function Form({ route, method }) {
                 placeholder="Password"
             />
             {loading && <LoadingIndicator />}
-            <button className="form-button" type="submit">
+            {errorMessage && <p className="error-text">{errorMessage}</p>}
+            <button className="form-button" type="submit" disabled={loading}>
                 {method === "login" ? "Login" : "Register"}
             </button>
         </form>

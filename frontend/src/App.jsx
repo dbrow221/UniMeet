@@ -9,6 +9,7 @@ import CampusMap from './pages/CampusMap'
 import CreateEvent from './pages/CreateEvent'
 import EventView from './pages/EventView'
 import { Events } from 'leaflet'
+import Header from './components/Header'
 
 function Logout() {
   localStorage.clear()
@@ -29,6 +30,7 @@ function RegisterAndLogout() {
 function App() {
   return (
     <BrowserRouter>
+       <Header/>
       <Routes>
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>
