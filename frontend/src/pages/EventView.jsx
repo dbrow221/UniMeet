@@ -99,7 +99,7 @@ const EventView = () => {
       <h1>Public Events</h1>
       <ul className="events-list">
         {events.map((event) => (
-         
+          
           <li key={event.id} className="event-item">
             <h2>{event.name}</h2>
             <p>📍 Location: <b>{event.location_details?.name || "Unknown"}</b></p>

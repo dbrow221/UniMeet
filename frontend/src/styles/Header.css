@@ -1,7 +1,7 @@
 .header {
-  background: #282c34;
+  background: rgba(255, 255, 255, 0.86);
   padding: 1rem;
-  color: white;
+  color: green;
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -16,7 +16,7 @@
 .nav-logo {
   font-size: 1.5rem;
   font-weight: bold;
-  color: white;
+  color: green;
   text-decoration: none;
 }
 
@@ -27,13 +27,13 @@
 }
 
 .nav-links a {
-  color: white;
+  color: green;
   text-decoration: none;
 }
 
 .logout-btn {
   background: transparent;
   border: none;
-  color: white;
+  color: green;
   cursor: pointer;
 }

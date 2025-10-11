@@ -5,7 +5,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: rgba(0, 128, 0, 0.671);
   color: white;
   text-align: center;
   padding: 20px;
@@ -50,7 +50,7 @@
 
 .btn-light {
   background: white;
-  color: #4f46e5;
+  color: green;
 }
 
 .btn-light:hover {
@@ -59,12 +59,12 @@
 }
 
 .btn-primary {
-  background: #4338ca;
-  color: white;
+  background: white;
+  color: green;
 }
 
 .btn-primary:hover {
-  background: #3730a3;
+  background: white;
   transform: scale(1.05);
 }
 
