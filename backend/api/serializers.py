@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Event, Location
+from .models import Event, Location, JoinRequest, Comment
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
@@ -92,3 +92,55 @@ class EventSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             validated_data["host"] = request.user
         return Event.objects.create(**validated_data)
+
+
+# --- JOIN REQUEST SERIALIZER ---
+
+class JoinRequestSerializer(serializers.ModelSerializer):
+    """Serializer for join requests to private events."""
+    
+    # Read-only nested details
+    event_details = EventSerializer(source="event", read_only=True)
+    user_details = SafeUserSerializer(source="user", read_only=True)
+    
+    class Meta:
+        model = JoinRequest
+        fields = [
+            "id",
+            "event",
+            "user",
+            "status",
+            "created_at",
+            "updated_at",
+            "event_details",
+            "user_details",
+        ]
+        read_only_fields = ["created_at", "updated_at", "status"]
+
+
+# --- COMMENT SERIALIZER ---
+
+class CommentSerializer(serializers.ModelSerializer):
+    """Serializer for event comments."""
+    
+    user_details = SafeUserSerializer(source="user", read_only=True)
+    
+    class Meta:
+        model = Comment
+        fields = [
+            "id",
+            "event",
+            "user",
+            "text",
+            "created_at",
+            "updated_at",
+            "user_details",
+        ]
+        read_only_fields = ["created_at", "updated_at", "user"]
+    
+    def create(self, validated_data):
+        """Ensure the comment user is the authenticated user."""
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["user"] = request.user
+        return Comment.objects.create(**validated_data)

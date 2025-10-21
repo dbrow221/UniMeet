@@ -54,3 +54,40 @@ class Event(models.Model):
         """Validate before saving to the database."""
         self.full_clean()  # runs clean() before saving
         super().save(*args, **kwargs)
+
+
+class JoinRequest(models.Model):
+    """Tracks requests to join private events."""
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('denied', 'Denied'),
+    ]
+    
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="join_requests")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="join_requests")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('event', 'user')  # Prevent duplicate requests
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.event.name} ({self.status})"
+
+
+class Comment(models.Model):
+    """Comments on events."""
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['created_at']  # Oldest first
+
+    def __str__(self):
+        return f"{self.user.username} on {self.event.name}: {self.text[:50]}"

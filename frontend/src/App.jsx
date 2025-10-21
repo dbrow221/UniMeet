@@ -1,5 +1,5 @@
 import React from 'react'
-import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from './pages/login'
 import Register from "./pages/register"
 import Home from "./pages/Home"
@@ -8,9 +8,10 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import CampusMap from './pages/CampusMap'
 import CreateEvent from './pages/CreateEvent'
 import EventView from './pages/EventView'
-import { Events } from 'leaflet'
 import Header from './components/Header'
+import Inbox from './components/Inbox'
 import Profile from './pages/Profile'
+import EditEvent from "./pages/EditEvent"
 
 function Logout() {
   localStorage.clear()
@@ -25,32 +26,37 @@ function RegisterAndLogout() {
   return <Register />;
 }
 
-
-
-
 function App() {
   return (
     <BrowserRouter>
-       <Header/>
-      <Routes>
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/logout" element={<Logout />} />
-        </Route>
+      {/* Always visible components */}
+      <Header />
+      <Inbox />
 
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<RegisterAndLogout />} />
-        <Route path="/map" element={<CampusMap />} />
-        <Route path='/create-event' element={<CreateEvent/>}/>
-        <Route path='/events' element={<EventView/>}/>
-        <Route path='/profile' element={<Profile/>}/>
+      {/* Page content */}
+      <div className="app-content">
+        <Routes>
+          {/* Protected routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/logout" element={<Logout />} />
+          </Route>
 
-        {/* Catch-all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Public routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<RegisterAndLogout />} />
+          <Route path="/map" element={<CampusMap />} />
+          <Route path='/create-event' element={<CreateEvent/>}/>
+          <Route path='/events' element={<EventView/>}/>
+          <Route path='/profile' element={<Profile/>}/>
+          <Route path="/events/edit/:id" element={<EditEvent />} />
+
+          {/* Catch-all */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   );
 }
+
 export default App
