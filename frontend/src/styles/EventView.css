@@ -74,3 +74,93 @@
   overflow: hidden;
   border: 1px solid #ccc;
 }
+
+/* Join / Request button */
+.join-event-btn {
+  margin-top: 12px;
+  padding: 8px 14px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.join-event-btn:hover {
+  background-color: #388e3c;
+  transform: scale(1.05);
+}
+
+/* Leave button */
+.leave-event-btn {
+  margin-top: 12px;
+  padding: 8px 14px;
+  background-color: #ff9800;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.leave-event-btn:hover {
+  background-color: #e68900;
+  transform: scale(1.05);
+}
+
+/* Edit button */
+.edit-event-btn {
+  margin-top: 12px;
+  padding: 8px 14px;
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.edit-event-btn:hover {
+  background-color: #1976d2;
+  transform: scale(1.05);
+}
+
+/* Optional: small gap between buttons */
+.event-item button {
+  margin-right: 8px;
+}
+/* Event type badges */
+.event-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.event-badge.public {
+  background-color: #4caf50; /* green */
+  color: #fff;
+}
+
+.event-badge.private {
+  background-color: #ff9800; /* orange */
+  color: #fff;
+}
+
+/* Background tint based on event type */
+.event-item.public {
+  border-color: #4caf50;
+  background-color: #f0fff0;
+}
+
+.event-item.private {
+  border-color: #ff9800;
+  background-color: #fff8f0;
+}

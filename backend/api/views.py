@@ -1,55 +1,150 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.db.models import Q
+from rest_framework.views import APIView
 
 from .serializers import UserSerializer, EventSerializer, LocationSerializer
 from .models import Event, Location
 
 
+# -------------------------------
+# Event List + Create
+# -------------------------------
 class EventListCreate(generics.ListCreateAPIView):
     serializer_class = EventSerializer
 
     def get_permissions(self):
         if self.request.method == "GET":
-            return [AllowAny()]   # anyone can view
-        return [IsAuthenticated()]  # only logged-in users can create
+            return [AllowAny()]  # anyone can view events
+        return [IsAuthenticated()]  # must be logged in to create
 
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            # Authenticated users: see public + their own events
+            # Authenticated: see public events + own events
             return Event.objects.filter(Q(is_public=True) | Q(host=user))
-        # Anonymous users: only public events
+        # Anonymous: only public events
         return Event.objects.filter(is_public=True)
 
     def perform_create(self, serializer):
-        """
-        ✅ Instead of forcing host=self.request.user,
-        we respect `host_id` passed in the payload.
-        Your EventSerializer maps host_id → host, so we
-        can just call save() normally.
-        """
+        # Host is automatically set in the serializer (from request.user)
         serializer.save()
 
 
+
+class EventDetail(generics.RetrieveAPIView):
+    """
+    Retrieve a single event by ID (read-only).
+    Public events visible to anyone.
+    Private events visible only to host or participants.
+    """
+    serializer_class = EventSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Event.objects.filter(Q(is_public=True) | Q(host=user) | Q(participant_list=user))
+        return Event.objects.filter(is_public=True)
+
+# -------------------------------
+# Event Update (host-only)
+# -------------------------------
+class EventUpdate(generics.RetrieveUpdateAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Hosts can only update their own events
+        return Event.objects.filter(host=self.request.user)
+
+
+# -------------------------------
+# Event Delete (host-only)
+# -------------------------------
 class EventDelete(generics.DestroyAPIView):
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
         # Only events created by the logged-in user can be deleted
-        return Event.objects.filter(host=user)
+        return Event.objects.filter(host=self.request.user)
 
 
 # -------------------------------
-# Create location safely (avoid duplicates)
+# Join Event
 # -------------------------------
+class JoinEventView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        user = request.user
+
+        if event.host == user:
+            return Response({"detail": "You are the host of this event."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if event.participant_list.filter(id=user.id).exists():
+            return Response({"detail": "You already joined this event."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if event.is_full():
+            return Response({"detail": "This event is full."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        event.participant_list.add(user)
+        return Response({"detail": "Successfully joined the event."},
+                        status=status.HTTP_200_OK)
+
+
 # -------------------------------
-# Create location safely (avoid duplicates + MultipleObjectsReturned)
+# Leave Event
+# -------------------------------
+class LeaveEventView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        event = get_object_or_404(Event, pk=pk)
+        user = request.user
+
+        if not event.participant_list.filter(id=user.id).exists():
+            return Response({"detail": "You are not part of this event."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        event.participant_list.remove(user)
+        return Response({"detail": "Successfully left the event."},
+                        status=status.HTTP_200_OK)
+
+
+# -------------------------------
+# Hosted Events (by current user)
+# -------------------------------
+class HostedEventsView(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Event.objects.filter(host=self.request.user).order_by("-start_time")
+
+
+# -------------------------------
+# Joined Events (by current user)
+# -------------------------------
+class JoinedEventsView(generics.ListAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Event.objects.filter(participant_list=self.request.user).order_by("-start_time")
+
+
+# -------------------------------
+# Create Location Safely
 # -------------------------------
 @api_view(["POST"])
 def create_location(request):
@@ -63,7 +158,6 @@ def create_location(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Try to find an existing location first
     location = Location.objects.filter(
         name=name,
         latitude=latitude,
@@ -84,6 +178,9 @@ def create_location(request):
     return Response(serializer.data, status=status_code)
 
 
+# -------------------------------
+# List Locations
+# -------------------------------
 @api_view(["GET"])
 def location_list(request):
     locations = Location.objects.all()
@@ -91,6 +188,9 @@ def location_list(request):
     return Response(serializer.data)
 
 
+# -------------------------------
+# Create User
+# -------------------------------
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
