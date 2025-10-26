@@ -86,7 +86,12 @@ const EventView = () => {
     }
   };
 
-  const toggleExpand = (eventId) => {
+  const toggleExpand = (eventId, isHost, hasJoined) => {
+    // Only allow expansion if user is host or participant
+    if (!isHost && !hasJoined) {
+      return; // Don't expand for non-participants
+    }
+
     if (expandedEventId === eventId) {
       setExpandedEventId(null);
     } else {
@@ -223,7 +228,7 @@ const EventView = () => {
 
           return (
             <li key={event.id} className={`event-item ${event.is_public ? "public" : "private"} ${isExpanded ? "expanded" : ""}`}>
-              <div className="event-header" onClick={() => toggleExpand(event.id)}>
+              <div className="event-header" onClick={() => toggleExpand(event.id, isHost, hasJoined)}>
                 <h2>
                   {event.name}
                   <span className={`event-badge ${event.is_public ? "public" : "private"}`}>
