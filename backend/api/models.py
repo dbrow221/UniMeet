@@ -44,6 +44,10 @@ class Event(models.Model):
         """Check if the event has reached its max capacity."""
         return self.participant_list.count() >= self.max_capacity
 
+    def is_expired(self):
+        """Check if the event has already ended."""
+        return timezone.now() > self.end_time
+
     def clean(self):
         """Ensure end_time is after start_time."""
         from django.core.exceptions import ValidationError

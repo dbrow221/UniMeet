@@ -234,6 +234,11 @@ const EventView = () => {
                   <span className={`event-badge ${event.is_public ? "public" : "private"}`}>
                     {event.is_public ? "Public" : "Private"}
                   </span>
+                  {event.is_expired && (
+                    <span className="event-badge expired">
+                      Expired
+                    </span>
+                  )}
                 </h2>
                 <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
               </div>

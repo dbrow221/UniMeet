@@ -44,6 +44,7 @@ class EventSerializer(serializers.ModelSerializer):
     location_details = LocationSerializer(source="location", read_only=True)
     host_details = SafeUserSerializer(source="host", read_only=True)
     participant_list = SafeUserSerializer(many=True, read_only=True)
+    is_expired = serializers.SerializerMethodField()
 
     # Write-only IDs for linking
     location_id = serializers.PrimaryKeyRelatedField(
@@ -69,8 +70,13 @@ class EventSerializer(serializers.ModelSerializer):
             "location_details",
             "host_details",
             "location_id",
+            "is_expired",
         ]
         read_only_fields = ["posted_date"]
+
+    def get_is_expired(self, obj):
+        """Return whether the event has expired."""
+        return obj.is_expired()
 
     # --- Validation logic ---
     def validate(self, data):

@@ -94,6 +94,11 @@
   color: white;
 }
 
+.event-badge.expired {
+  background-color: #6c757d;
+  color: white;
+}
+
 /* Event summary */
 .event-summary {
   padding: 20px;
