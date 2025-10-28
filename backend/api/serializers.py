@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+<<<<<<< HEAD
 from .models import Event, Location, Profile, JoinRequest, Comment
+=======
+from .models import Event, Location, JoinRequest, Comment
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
@@ -8,12 +12,17 @@ from django.utils import timezone
 # --- USER SERIALIZERS ---
 
 class UserSerializer(serializers.ModelSerializer):
+<<<<<<< HEAD
     # for user registration and updates
+=======
+    """Used only for user registration (write-only password)."""
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     class Meta:
         model = User
         fields = ["id", "username", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
+<<<<<<< HEAD
     def update(self, instance, validated_data):
         # handling for password change
         password = validated_data.pop("password", None)
@@ -56,6 +65,16 @@ class NestedUserSerializer(serializers.ModelSerializer):
 
 class SafeUserSerializer(serializers.ModelSerializer):
     # for displaying user data safely (no password)
+=======
+    def create(self, validated_data):
+        """Automatically hashes the password."""
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
+class SafeUserSerializer(serializers.ModelSerializer):
+    """Used for displaying user data safely (no password)."""
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     class Meta:
         model = User
         fields = ["id", "username"]
@@ -86,6 +105,11 @@ class EventSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+<<<<<<< HEAD
+=======
+    # host_id removed for security (host auto-set from request.user)
+
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     class Meta:
         model = Event
         fields = [
@@ -104,6 +128,10 @@ class EventSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["posted_date"]
 
+<<<<<<< HEAD
+=======
+    # --- Validation logic ---
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     def validate(self, data):
         start = data.get("start_time", getattr(self.instance, "start_time", None))
         end = data.get("end_time", getattr(self.instance, "end_time", None))
@@ -116,6 +144,10 @@ class EventSerializer(serializers.ModelSerializer):
 
         return data
 
+<<<<<<< HEAD
+=======
+    # --- Creation logic ---
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     def create(self, validated_data):
         """Ensure the event host is the authenticated user."""
         request = self.context.get("request")
@@ -124,6 +156,7 @@ class EventSerializer(serializers.ModelSerializer):
         return Event.objects.create(**validated_data)
 
 
+<<<<<<< HEAD
 # --- PROFILE SERIALIZER ---
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -175,11 +208,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         return rep
 
 
+=======
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
 # --- JOIN REQUEST SERIALIZER ---
 
 class JoinRequestSerializer(serializers.ModelSerializer):
     """Serializer for join requests to private events."""
     
+<<<<<<< HEAD
+=======
+    # Read-only nested details
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     event_details = EventSerializer(source="event", read_only=True)
     user_details = SafeUserSerializer(source="user", read_only=True)
     
