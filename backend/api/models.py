@@ -60,7 +60,6 @@ class Event(models.Model):
         super().save(*args, **kwargs)
 
 
-<<<<<<< HEAD
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     bio = models.TextField(blank=True)
@@ -72,8 +71,6 @@ class Profile(models.Model):
         return self.user.username
 
 
-=======
->>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
 class JoinRequest(models.Model):
     """Tracks requests to join private events."""
     STATUS_CHOICES = [
