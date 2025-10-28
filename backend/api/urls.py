@@ -1,6 +1,10 @@
 from django.urls import path
 from . import views
+<<<<<<< HEAD
+from .views import get_user_by_id, ProfileDetailView
+=======
 from .views import get_user_by_id
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -30,6 +34,12 @@ urlpatterns = [
     path("locations/", views.location_list, name="location-list"),
     path("locations/create/", views.create_location, name="create-location"),
 
+<<<<<<< HEAD
+    # --- Profile Endpoint ---
+    path("profile/", ProfileDetailView.as_view(), name="profile"),
+
+=======
+>>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
     # --- Auth (JWT) ---
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
