@@ -11,11 +11,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-<<<<<<< HEAD
 .edit-profile-btn button {
-=======
-.edit-profile-btn {
->>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
   margin-top: 1rem;
   padding: 0.5rem 1rem;
   background-color: #f87171;
@@ -25,7 +21,6 @@
   cursor: pointer;
 }
 
-<<<<<<< HEAD
 /* PROFILE SETTINGS PAGE STYLING */
 .edit-profile-btn:hover {
   background-color: #ef4444;
@@ -128,8 +123,3 @@
 .profile-view p {
   margin: 0.5rem 0;
 }
-=======
-.edit-profile-btn:hover {
-  background-color: #ef4444;
-}
->>>>>>> 6466b375c94b4c0bc258cf50ed19f1a9398ac15e
