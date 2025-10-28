@@ -1,0 +1,39 @@
+.header {
+  background: rgba(255, 255, 255, 0.86);
+  padding: 1rem;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: green;
+  text-decoration: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links a {
+  color: green;
+  text-decoration: none;
+}
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  color: green;
+  cursor: pointer;
+}

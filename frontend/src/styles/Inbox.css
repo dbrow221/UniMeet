@@ -1,0 +1,189 @@
+/* Drawer styles */
+.inbox {
+  width: 320px;
+  position: fixed;
+  top: 30px; /* adjust for header */
+  right: 0;
+  bottom: 0;
+  background-color: #fff;
+  border-left: 1px solid #ccc;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+  transform: translateX(100%); /* hidden by default */
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* When open */
+.inbox.open {
+  transform: translateX(0);
+}
+
+/* Toggle button */
+.inbox-toggle {
+  position: fixed;
+  top: 70px; /* below header */
+  right: 20px;
+  z-index: 1100;
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inbox-toggle:hover {
+  background-color: #0056b3;
+}
+
+/* Badge for notification count */
+.inbox-badge {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Inbox heading */
+.inbox h3 {
+  margin: 0 0 15px 0;
+  font-size: 20px;
+  color: #333;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 10px;
+}
+
+/* Status messages */
+.inbox-status,
+.inbox-error,
+.inbox-empty {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.inbox-error {
+  color: #dc3545;
+}
+
+/* Inbox list */
+.inbox-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Individual inbox item */
+.inbox-item {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
+}
+
+.inbox-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Item header with username and time */
+.inbox-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.inbox-item-header strong {
+  color: #007bff;
+  font-size: 15px;
+}
+
+.inbox-item-time {
+  font-size: 11px;
+  color: #6c757d;
+}
+
+/* Event name */
+.inbox-item-event {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #495057;
+}
+
+.inbox-item-event strong {
+  color: #333;
+}
+
+/* Action buttons container */
+.inbox-item-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Button base styles */
+.inbox-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+/* Approve button */
+.inbox-btn-approve {
+  background-color: #28a745;
+  color: white;
+}
+
+.inbox-btn-approve:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Deny button */
+.inbox-btn-deny {
+  background-color: #dc3545;
+  color: white;
+}
+
+.inbox-btn-deny:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Scrollbar styling for inbox */
+.inbox::-webkit-scrollbar {
+  width: 6px;
+}
+
+.inbox::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.inbox::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.inbox::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -1,0 +1,42 @@
+.edit-event-wrapper {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 25px;
+  border-radius: 10px;
+  border: 2px solid #006400;
+  background-color: #f8fff8;
+  font-family: Arial, sans-serif;
+}
+
+.edit-event-wrapper h1 {
+  text-align: center;
+  color: #004d00;
+}
+
+.edit-event-form label {
+  display: block;
+  margin-bottom: 15px;
+}
+
+.edit-event-form input,
+.edit-event-form textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.save-event-btn {
+  background-color: #006400;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.save-event-btn:hover {
+  background-color: #004d00;
+}

@@ -1,0 +1,46 @@
+/* frontend/src/styles/CampusMap.css */
+
+.map-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.campus-map {
+  width: 100%;
+  max-width: 900px;
+  height: 600px;
+  margin-bottom: 20px;
+  border: 2px solid #006400;
+  border-radius: 8px;
+}
+
+.selection-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.selection-info p {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.select-location-btn {
+  padding: 10px 20px;
+  background-color: #006400;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease-in-out;
+}
+
+.select-location-btn:hover {
+  background-color: #004d00;
+  transform: scale(1.05);
+}
