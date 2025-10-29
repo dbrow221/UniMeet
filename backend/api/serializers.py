@@ -139,6 +139,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(allow_blank=True, required=False)
     location = serializers.CharField(allow_blank=True, required=False)
     pronouns = serializers.CharField(allow_blank=True, required=False)
+    profile_picture = serializers.URLField(allow_blank=True, required=False, max_length=500)
     username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
@@ -150,6 +151,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "location",
             "pronouns",
             "notifications_enabled",
+            "profile_picture",
         ]
 
     def update(self, instance, validated_data):

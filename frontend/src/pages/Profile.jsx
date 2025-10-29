@@ -11,6 +11,7 @@ function Profile() {
     location: "",
     pronouns: "",
     notifications_enabled: true,
+    profile_picture: "",
   });
 
   const token = localStorage.getItem(ACCESS_TOKEN);
@@ -34,6 +35,7 @@ function Profile() {
           location: data.location || "",
           pronouns: data.pronouns || "",
           notifications_enabled: !!data.notifications_enabled,
+          profile_picture: data.profile_picture || "",
         });
       })
       .catch((err) => console.error("ERROR LOADING PROFILE:", err));
@@ -64,7 +66,8 @@ function Profile() {
       formData.bio !== (profile.bio || "") ||
       formData.location !== (profile.location || "") ||
       formData.pronouns !== (profile.pronouns || "") ||
-      formData.notifications_enabled !== !!profile.notifications_enabled
+      formData.notifications_enabled !== !!profile.notifications_enabled ||
+      formData.profile_picture !== (profile.profile_picture || "")
     ) {
       return true;
     }
@@ -87,7 +90,7 @@ function Profile() {
     }
 
     // Check other profile fields for changes
-    ["bio", "location", "pronouns", "notifications_enabled"].forEach(
+    ["bio", "location", "pronouns", "notifications_enabled", "profile_picture"].forEach(
       (field) => {
         if (formData[field] !== profile[field]) {
           payload[field] = formData[field];
@@ -132,16 +135,62 @@ function Profile() {
       .catch((err) => console.error("Error updating profile:", err));
   };
 
-  /* Render loading state if profile not yet fetched 
-  SHOULD NOT LAST LONG, INDICATIVE OF POSSIBLE ERROR */
-  if (!profile) return <p>Loading profile...</p>;
+  /* Render loading state if profile not yet fetched */
+  if (!profile) return (
+    <div className="profile-wrapper">
+      <div className="loading-container">
+        <p>Loading profile...</p>
+      </div>
+    </div>
+  );
+
+  // Generate initials for default avatar
+  const getInitials = (username) => {
+    return username ? username.substring(0, 2).toUpperCase() : "??";
+  };
 
   return (
     <div className="profile-wrapper">
-      <h1>Profile Settings</h1>
+      <div className="profile-header">
+        <h1>Profile Settings</h1>
+      </div>
 
       {editing ? (
         <div className="profile-edit">
+          {/* Profile Picture Section */}
+          <div className="profile-picture-section">
+            <div className="profile-picture-preview">
+              {formData.profile_picture ? (
+                <img 
+                  src={formData.profile_picture} 
+                  alt="Profile" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div 
+                className="profile-picture-placeholder"
+                style={{ display: formData.profile_picture ? 'none' : 'flex' }}
+              >
+                {getInitials(formData.user.username)}
+              </div>
+            </div>
+            <div className="profile-field">
+              <label>Profile Picture URL:</label>
+              <input
+                name="profile_picture"
+                value={formData.profile_picture}
+                onChange={handleChange}
+                placeholder="https://example.com/your-image.jpg"
+              />
+              <small className="field-hint">Enter a URL to an image (optional)</small>
+            </div>
+          </div>
+
+          <div className="section-divider"></div>
+
           <h2>Account Info</h2>
           <div className="profile-field">
             <label>Username:</label>
@@ -206,13 +255,57 @@ function Profile() {
         </div>
       ) : (
         <div className="profile-view">
-          <p><strong>Username:</strong> {profile.username}</p>
-          <p><strong>Bio:</strong> {profile.bio || "No bio set"}</p>
-          <p><strong>Location:</strong> {profile.location || "No location set"}</p>
-          <p><strong>Pronouns:</strong> {profile.pronouns || "Not specified"}</p>
-          <p><strong>Notifications:</strong> {profile.notifications_enabled ? "Enabled" : "Disabled"}</p>
+          <div className="profile-view-header">
+            <div className="profile-picture-large">
+              {profile.profile_picture ? (
+                <img 
+                  src={profile.profile_picture} 
+                  alt="Profile" 
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div 
+                className="profile-picture-placeholder"
+                style={{ display: profile.profile_picture ? 'none' : 'flex' }}
+              >
+                {getInitials(profile.username)}
+              </div>
+            </div>
+            <div className="profile-view-info">
+              <h2>{profile.username}</h2>
+              {profile.pronouns && (
+                <p className="pronouns-badge">{profile.pronouns}</p>
+              )}
+            </div>
+          </div>
 
-          <button onClick={() => setEditing(true)}>Edit Profile</button>
+          <div className="profile-details-grid">
+            <div className="profile-detail-card">
+              <div className="detail-label">Bio</div>
+              <div className="detail-value">{profile.bio || "No bio set"}</div>
+            </div>
+
+            <div className="profile-detail-card">
+              <div className="detail-label">Location</div>
+              <div className="detail-value">{profile.location || "No location set"}</div>
+            </div>
+
+            <div className="profile-detail-card">
+              <div className="detail-label">Notifications</div>
+              <div className="detail-value">
+                <span className={`status-badge ${profile.notifications_enabled ? 'enabled' : 'disabled'}`}>
+                  {profile.notifications_enabled ? "Enabled" : "Disabled"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button className="edit-profile-button" onClick={() => setEditing(true)}>
+            <span>✏️</span> Edit Profile
+          </button>
         </div>
       )}
     </div>

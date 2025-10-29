@@ -66,6 +66,7 @@ class Profile(models.Model):
     location = models.CharField(max_length=100, blank=True)
     pronouns = models.CharField(max_length=50, blank=True)
     notifications_enabled = models.BooleanField(default=True)
+    profile_picture = models.URLField(blank=True, max_length=500)
 
     def __str__(self):
         return self.user.username
