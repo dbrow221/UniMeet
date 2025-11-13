@@ -8,10 +8,12 @@ Helping college students enhance their campus experience and social life with ev
 **Brady Bryan** - Profile Settings, Account + ID Handling
 
 ## Images
-<img width="959" height="563" alt="Image" src="https://github.com/user-attachments/assets/97cedc98-3d3d-44ca-840e-738fbfaa5988" />
+<img width="1918" height="1071" alt="Screenshot 2025-10-31 133601" src="https://github.com/user-attachments/assets/a581e794-63b4-4766-a595-32b46fdced03" />
 
-<img width="959" height="563" alt="Image" src="https://github.com/user-attachments/assets/3767f693-92bc-4930-a3db-cd7cb096416d" />
+<img width="1919" height="1057" alt="Screenshot 2025-10-31 133807" src="https://github.com/user-attachments/assets/7a1eb717-8e16-49d4-b366-855e8a21de54" />
 
-<img width="959" height="563" alt="Image" src="https://github.com/user-attachments/assets/cce7df51-ec40-44b0-a642-e4f759deecfe" />
+<img width="1919" height="1061" alt="Screenshot 2025-10-31 133851" src="https://github.com/user-attachments/assets/797a5f83-1b8a-43f6-be91-849881edb601" />
 
-<img width="959" height="562" alt="Image" src="https://github.com/user-attachments/assets/0771733e-8904-49bd-a107-8313f8a9d487" />
+<img width="1920" height="1146" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/33e41979-3557-4b85-a121-f897a5c4b431" />
+
+<img width="1919" height="1055" alt="Screenshot 2025-10-31 133738" src="https://github.com/user-attachments/assets/97d974a8-8cf0-47b5-9423-eb4729403707" />
