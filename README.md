@@ -1,9 +1,9 @@
-==================== Coding Contributions ====================
-
-Demetrius Brown - Event Creation + Map Page, Login, Landing Page\n
-Godson Jean - User Story Manager, Bug Fixer + Refactorer\n
-Erik Villanueva Gomez - Event filter implementation\n
-Brady Bryan - Profile Settings, Account + ID Handling\n
+==================== Coding Contributions ====================<br />
+<br />
+Demetrius Brown - Event Creation, Map Page, Login Page/Functionality, Landing Page<br />
+Godson Jean - User Story Manager, Bug Fixer + Refactorer<br />
+Erik Villanueva Gomez - Event filter implementation<br />
+Brady Bryan - Profile Settings, Account + ID Handling<br />
 
 <img width="959" height="563" alt="Image" src="https://github.com/user-attachments/assets/97cedc98-3d3d-44ca-840e-738fbfaa5988" />
 
