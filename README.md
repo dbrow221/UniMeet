@@ -14,6 +14,6 @@ Helping college students enhance their campus experience and social life with ev
 
 <img width="1919" height="1061" alt="Screenshot 2025-10-31 133851" src="https://github.com/user-attachments/assets/797a5f83-1b8a-43f6-be91-849881edb601" />
 
-<img width="1920" height="1146" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/33e41979-3557-4b85-a121-f897a5c4b431" />
+<img width="1920" height="1062" alt="Screenshot (7)" src="https://github.com/user-attachments/assets/79495fe7-a4a9-4b24-8ed0-4f56e926c8cd" />
 
 <img width="1919" height="1055" alt="Screenshot 2025-10-31 133738" src="https://github.com/user-attachments/assets/97d974a8-8cf0-47b5-9423-eb4729403707" />
