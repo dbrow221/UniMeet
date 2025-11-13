@@ -1,7 +1,7 @@
 # UniMeet
 Helping college students enhance their campus experience and social life with events brought straight to you by others in the community!
 
-## **Coding Contributions**<br />
+## Coding Contributions<br />
 <br />
 **Demetrius Brown** - Event Creation, Map Page, Login Page/Functionality, Landing Page<br />
 **Godson Jean** - User Story Manager, Bug Fixer + Refactorer<br />
