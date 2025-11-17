@@ -11,7 +11,9 @@ import EventView from './pages/EventView'
 import Header from './components/Header'
 import Inbox from './components/Inbox'
 import Profile from './pages/Profile'
+import UserProfile from './pages/UserProfile'
 import EditEvent from "./pages/EditEvent"
+import FriendSearch from './pages/FriendSearch'
 
 function Logout() {
   localStorage.clear()
@@ -49,7 +51,9 @@ function App() {
           <Route path='/create-event' element={<CreateEvent/>}/>
           <Route path='/events' element={<EventView/>}/>
           <Route path='/profile' element={<Profile/>}/>
+          <Route path='/user/:userId' element={<UserProfile/>}/>
           <Route path="/events/edit/:id" element={<EditEvent />} />
+          <Route path='users/search/' element={<FriendSearch/>}/>
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />

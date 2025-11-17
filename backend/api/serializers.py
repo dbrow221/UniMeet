@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Event, Location, Profile, JoinRequest, Comment
+from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
@@ -234,3 +234,29 @@ class CommentSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             validated_data["user"] = request.user
         return Comment.objects.create(**validated_data)
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    """Serializer for friend requests between users."""
+    
+    from_user_details = SafeUserSerializer(source="from_user", read_only=True)
+    to_user_details = SafeUserSerializer(source="to_user", read_only=True)
+    
+    class Meta:
+        model = FriendRequest
+        fields = [
+            "id",
+            "from_user",
+            "to_user",
+            "status",
+            "created_at",
+            "updated_at",
+            "from_user_details",
+            "to_user_details",
+        ]
+        read_only_fields = ["created_at", "updated_at", "status"]
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    """Serializer for user search results."""
+    class Meta:
+        model = User
+        fields = ["id", "username"]        

@@ -5,25 +5,31 @@ import "../styles/Inbox.css";
 export default function Inbox() {
   const [isOpen, setIsOpen] = useState(false);
   const [joinRequests, setJoinRequests] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch join requests when the inbox is opened
+  // Fetch requests when the inbox is opened
   useEffect(() => {
     if (isOpen) {
-      fetchJoinRequests();
+      fetchRequests();
     }
   }, [isOpen]);
 
-  const fetchJoinRequests = async () => {
+  const fetchRequests = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get("/api/join-requests/");
-      setJoinRequests(response.data);
+      // Fetch both join requests and friend requests
+      const [joinResponse, friendResponse] = await Promise.all([
+        api.get("/api/join-requests/"),
+        api.get("/api/friend-requests/received/")
+      ]);
+      setJoinRequests(joinResponse.data);
+      setFriendRequests(friendResponse.data);
     } catch (err) {
-      console.error("Error fetching join requests:", err);
-      setError("Failed to load join requests");
+      console.error("Error fetching requests:", err);
+      setError("Failed to load notifications");
     } finally {
       setLoading(false);
     }
@@ -33,7 +39,7 @@ export default function Inbox() {
     try {
       await api.post(`/api/join-requests/${requestId}/approve/`);
       // Refresh the list after approval
-      fetchJoinRequests();
+      fetchRequests();
     } catch (err) {
       console.error("Error approving request:", err);
       alert(err.response?.data?.detail || "Failed to approve request");
@@ -44,10 +50,32 @@ export default function Inbox() {
     try {
       await api.post(`/api/join-requests/${requestId}/deny/`);
       // Refresh the list after denial
-      fetchJoinRequests();
+      fetchRequests();
     } catch (err) {
       console.error("Error denying request:", err);
       alert(err.response?.data?.detail || "Failed to deny request");
+    }
+  };
+
+  const handleAcceptFriend = async (requestId) => {
+    try {
+      await api.patch(`/api/friend-requests/${requestId}/accept/`);
+      // Refresh the list after acceptance
+      fetchRequests();
+    } catch (err) {
+      console.error("Error accepting friend request:", err);
+      alert(err.response?.data?.detail || "Failed to accept friend request");
+    }
+  };
+
+  const handleDeclineFriend = async (requestId) => {
+    try {
+      await api.patch(`/api/friend-requests/${requestId}/decline/`);
+      // Refresh the list after declining
+      fetchRequests();
+    } catch (err) {
+      console.error("Error declining friend request:", err);
+      alert(err.response?.data?.detail || "Failed to decline friend request");
     }
   };
 
@@ -56,13 +84,15 @@ export default function Inbox() {
     return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const totalNotifications = joinRequests.length + friendRequests.length;
+
   return (
     <>
       {/* Toggle button */}
       <button className="inbox-toggle" onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? "Close Inbox" : "Inbox"}
-        {!isOpen && joinRequests.length > 0 && (
-          <span className="inbox-badge">{joinRequests.length}</span>
+        {!isOpen && totalNotifications > 0 && (
+          <span className="inbox-badge">{totalNotifications}</span>
         )}
       </button>
 
@@ -74,40 +104,80 @@ export default function Inbox() {
         
         {error && <p className="inbox-error">{error}</p>}
         
-        {!loading && !error && joinRequests.length === 0 && (
+        {!loading && !error && totalNotifications === 0 && (
           <p className="inbox-empty">No new notifications</p>
         )}
         
+        {/* Friend Requests Section */}
+        {!loading && !error && friendRequests.length > 0 && (
+          <div className="inbox-section">
+            <h4 className="inbox-section-title">Friend Requests</h4>
+            <ul className="inbox-list">
+              {friendRequests.map((request) => (
+                <li key={`friend-${request.id}`} className="inbox-item">
+                  <div className="inbox-item-header">
+                    <strong>{request.from_user_details.username}</strong>
+                    <span className="inbox-item-time">
+                      {formatDate(request.created_at)}
+                    </span>
+                  </div>
+                  <div className="inbox-item-event">
+                    wants to be your friend
+                  </div>
+                  <div className="inbox-item-actions">
+                    <button 
+                      className="inbox-btn inbox-btn-approve"
+                      onClick={() => handleAcceptFriend(request.id)}
+                    >
+                      Accept
+                    </button>
+                    <button 
+                      className="inbox-btn inbox-btn-deny"
+                      onClick={() => handleDeclineFriend(request.id)}
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {/* Join Requests Section */}
         {!loading && !error && joinRequests.length > 0 && (
-          <ul className="inbox-list">
-            {joinRequests.map((request) => (
-              <li key={request.id} className="inbox-item">
-                <div className="inbox-item-header">
-                  <strong>{request.user_details.username}</strong>
-                  <span className="inbox-item-time">
-                    {formatDate(request.created_at)}
-                  </span>
-                </div>
-                <div className="inbox-item-event">
-                  wants to join: <strong>{request.event_details.name}</strong>
-                </div>
-                <div className="inbox-item-actions">
-                  <button 
-                    className="inbox-btn inbox-btn-approve"
-                    onClick={() => handleApprove(request.id)}
-                  >
-                    Approve
-                  </button>
-                  <button 
-                    className="inbox-btn inbox-btn-deny"
-                    onClick={() => handleDeny(request.id)}
-                  >
-                    Deny
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="inbox-section">
+            <h4 className="inbox-section-title">Event Join Requests</h4>
+            <ul className="inbox-list">
+              {joinRequests.map((request) => (
+                <li key={`join-${request.id}`} className="inbox-item">
+                  <div className="inbox-item-header">
+                    <strong>{request.user_details.username}</strong>
+                    <span className="inbox-item-time">
+                      {formatDate(request.created_at)}
+                    </span>
+                  </div>
+                  <div className="inbox-item-event">
+                    wants to join: <strong>{request.event_details.name}</strong>
+                  </div>
+                  <div className="inbox-item-actions">
+                    <button 
+                      className="inbox-btn inbox-btn-approve"
+                      onClick={() => handleApprove(request.id)}
+                    >
+                      Approve
+                    </button>
+                    <button 
+                      className="inbox-btn inbox-btn-deny"
+                      onClick={() => handleDeny(request.id)}
+                    >
+                      Deny
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </>

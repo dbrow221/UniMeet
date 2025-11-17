@@ -69,9 +69,23 @@
 .inbox-error,
 .inbox-empty {
   text-align: center;
-  padding: 20px;
-  color: #666;
+  color: #999;
   font-style: italic;
+  padding: 20px;
+}
+
+.inbox-section {
+  margin-bottom: 20px;
+}
+
+.inbox-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  margin: 15px 0 10px 0;
+  padding: 0 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .inbox-error {

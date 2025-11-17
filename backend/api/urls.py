@@ -25,6 +25,7 @@ urlpatterns = [
 
     # --- User Endpoints ---
     path("user/<int:user_id>/", get_user_by_id, name="get_user_by_id"),
+    path("user/<int:user_id>/profile/", views.get_user_profile, name="get_user_profile"),
 
     # --- Location Endpoints ---
     path("locations/", views.location_list, name="location-list"),
@@ -36,4 +37,13 @@ urlpatterns = [
     # --- Auth (JWT) ---
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    path("friend-requests/send/<int:to_user_id>/", views.SendFriendRequestView.as_view(), name="send-friend-request"),
+    path("friend-requests/received/", views.ReceivedFriendRequestsView.as_view(), name="received-friend-requests"),
+    path("friend-requests/sent/", views.SentFriendRequestsView.as_view(), name="sent-friend-requests"),
+    path("friend-requests/<int:pk>/accept/", views.AcceptFriendRequestView.as_view(), name="accept-friend-request"),
+    path("friend-requests/<int:pk>/decline/", views.DeclineFriendRequestView.as_view(), name="decline-friend-request"),
+    path("friends/", views.FriendsListView.as_view(), name="friends-list"),
+    path("friends/remove/<int:friend_id>/", views.RemoveFriendView.as_view(), name="remove-friend"),
+    path("users/search/", views.UserSearchView.as_view(), name="user-search"),
 ]

@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { ACCESS_TOKEN } from "../constants";
 import "../styles/Profile.css";
 
 function Profile() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
+  const [friends, setFriends] = useState([]);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     user: { username: "", password: "" },
@@ -41,6 +44,23 @@ function Profile() {
       .catch((err) => console.error("ERROR LOADING PROFILE:", err));
   }, [token]);
 
+  // Fetch friends list
+  useEffect(() => {
+    if (!token) return;
+
+    fetch("http://127.0.0.1:8000/api/friends/", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch friends");
+        return res.json();
+      })
+      .then((data) => {
+        setFriends(data);
+      })
+      .catch((err) => console.error("ERROR LOADING FRIENDS:", err));
+  }, [token]);
+
   // Handle form field changes when editing
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
@@ -73,6 +93,31 @@ function Profile() {
     }
     return false;
   }, [formData, profile]);
+
+  // Handle removing a friend
+  const handleRemoveFriend = (friendId, friendUsername) => {
+    if (!confirm(`Are you sure you want to remove ${friendUsername} from your friends?`)) {
+      return;
+    }
+
+    fetch(`http://127.0.0.1:8000/api/friends/remove/${friendId}/`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to remove friend");
+        return res.json();
+      })
+      .then(() => {
+        // Update friends list by removing the friend
+        setFriends((prev) => prev.filter((f) => f.id !== friendId));
+        alert("Friend removed successfully.");
+      })
+      .catch((err) => {
+        console.error("Error removing friend:", err);
+        alert("Failed to remove friend.");
+      });
+  };
 
   // Handle saving changes to backend
   const handleSave = () => {
@@ -301,6 +346,53 @@ function Profile() {
                 </span>
               </div>
             </div>
+
+            <div className="profile-detail-card">
+              <div className="detail-label">Friends</div>
+              <div className="detail-value">
+                <span className="friends-count">{friends.length}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Friends Section */}
+          <div className="friends-section">
+            <h3 className="friends-section-title">
+              Friends ({friends.length})
+            </h3>
+            {friends.length === 0 ? (
+              <p className="no-friends-message">
+                No friends yet. Search for users to send friend requests!
+              </p>
+            ) : (
+              <ul className="friends-list">
+                {friends.map((friend) => (
+                  <li key={friend.id} className="friend-item">
+                    <div 
+                      className="friend-clickable"
+                      onClick={() => navigate(`/user/${friend.id}`)}
+                    >
+                      <div className="friend-avatar">
+                        {getInitials(friend.username)}
+                      </div>
+                      <div className="friend-info">
+                        <span className="friend-username">{friend.username}</span>
+                      </div>
+                    </div>
+                    <button
+                      className="remove-friend-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFriend(friend.id, friend.username);
+                      }}
+                      title="Remove friend"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <button className="edit-profile-button" onClick={() => setEditing(true)}>
