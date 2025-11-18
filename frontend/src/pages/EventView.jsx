@@ -28,7 +28,23 @@ const EventView = () => {
   const [comments, setComments] = useState({});
   const [newComment, setNewComment] = useState({});
   const [loadingComments, setLoadingComments] = useState({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
   const navigate = useNavigate();
+
+  const categoryOptions = [
+    { value: '', label: 'All Categories' },
+    { value: 'sporting', label: 'Sporting' },
+    { value: 'tutoring', label: 'Tutoring' },
+    { value: 'advising', label: 'Advising' },
+    { value: 'social', label: 'Social' },
+    { value: 'academic', label: 'Academic' },
+    { value: 'cultural', label: 'Cultural' },
+    { value: 'volunteering', label: 'Volunteering' },
+    { value: 'career', label: 'Career' },
+    { value: 'other', label: 'Other' },
+  ];
 
   const fetchEvents = async () => {
     try {
@@ -36,7 +52,14 @@ const EventView = () => {
       const headers = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const response = await fetch("http://127.0.0.1:8000/api/events/", { headers });
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (categoryFilter) params.append('category', categoryFilter);
+      if (dateFilter) params.append('date', dateFilter);
+
+      const url = `http://127.0.0.1:8000/api/events/${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await fetch(url, { headers });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const data = await response.json();
@@ -122,7 +145,7 @@ const EventView = () => {
       }
     }
     fetchEvents();
-  }, []);
+  }, [searchQuery, categoryFilter, dateFilter]);
 
   // Set up real-time comment polling for expanded event
   useEffect(() => {
@@ -214,12 +237,56 @@ const EventView = () => {
   };
 
   if (loading) return <p>Loading events...</p>;
-  if (events.length === 0) return <p>No events available.</p>;
 
   return (
     <div className="events-wrapper">
       <h1>Events</h1>
-      <ul className="events-list">
+      
+      <div className="filter-controls">
+        <input
+          type="text"
+          placeholder="Search events by name..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+        
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="category-filter"
+        >
+          {categoryOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="date-filter"
+          placeholder="Filter by date"
+        />
+        
+        <button
+          onClick={() => {
+            setSearchQuery("");
+            setCategoryFilter("");
+            setDateFilter("");
+          }}
+          className="clear-filters-btn"
+        >
+          Clear Filters
+        </button>
+      </div>
+
+      {events.length === 0 ? (
+        <p>No events found matching your criteria.</p>
+      ) : (
+        <ul className="events-list">
         {events.map((event) => {
           const isHost = currentID && event.host_details?.id === currentID;
           const hasJoined = event.participant_list?.some(p => p.id === currentID);
@@ -358,6 +425,7 @@ const EventView = () => {
           );
         })}
       </ul>
+      )}
     </div>
   );
 };

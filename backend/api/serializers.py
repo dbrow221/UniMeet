@@ -93,6 +93,7 @@ class EventSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "details",
+            "category",
             "posted_date",
             "is_public",
             "start_time",
@@ -259,4 +260,4 @@ class UserSearchSerializer(serializers.ModelSerializer):
     """Serializer for user search results."""
     class Meta:
         model = User
-        fields = ["id", "username"]        
+        fields = ["id", "username"]

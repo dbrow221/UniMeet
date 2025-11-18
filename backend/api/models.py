@@ -26,8 +26,21 @@ class Location(models.Model):
 
 
 class Event(models.Model):
+    CATEGORY_CHOICES = [
+        ('sporting', 'Sporting'),
+        ('tutoring', 'Tutoring'),
+        ('advising', 'Advising'),
+        ('social', 'Social'),
+        ('academic', 'Academic'),
+        ('cultural', 'Cultural'),
+        ('volunteering', 'Volunteering'),
+        ('career', 'Career'),
+        ('other', 'Other'),
+    ]
+    
     name = models.CharField(max_length=50)
     details = models.TextField()
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
     posted_date = models.DateTimeField(auto_now_add=True)
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name="events")
     location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="events")
@@ -153,4 +166,4 @@ class UserSearch(models.Model):
         ordering = ['-timestamp']
 
     def __str__(self):
-        return f"{self.user.username} searched for '{self.query}' at {self.timestamp}"    
+        return f"{self.user.username} searched for '{self.query}' at {self.timestamp}"

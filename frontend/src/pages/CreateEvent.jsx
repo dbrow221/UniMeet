@@ -11,10 +11,23 @@ const CreateEvent = () => {
 
   const [name, setName] = useState("");
   const [details, setDetails] = useState("");
+  const [category, setCategory] = useState("other");
   const [isPublic, setIsPublic] = useState(true);
   const [startTime, setStartTime] = useState(""); // ISO string
   const [endTime, setEndTime] = useState("");     // ISO string
   const [maxCapacity, setMaxCapacity] = useState(10);
+
+  const categoryOptions = [
+    { value: 'sporting', label: 'Sporting' },
+    { value: 'tutoring', label: 'Tutoring' },
+    { value: 'advising', label: 'Advising' },
+    { value: 'social', label: 'Social' },
+    { value: 'academic', label: 'Academic' },
+    { value: 'cultural', label: 'Cultural' },
+    { value: 'volunteering', label: 'Volunteering' },
+    { value: 'career', label: 'Career' },
+    { value: 'other', label: 'Other' },
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,6 +85,7 @@ const CreateEvent = () => {
       const eventPayload = {
         name,
         details,
+        category,
         is_public: isPublic,
         host_id: hostId,
         location_id: locationId,
@@ -123,6 +137,17 @@ const CreateEvent = () => {
         <div>
           <label>Details:</label>
           <textarea value={details} onChange={(e) => setDetails(e.target.value)} required />
+        </div>
+
+        <div>
+          <label>Category:</label>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

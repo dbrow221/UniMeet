@@ -34,8 +34,34 @@ class EventListCreate(generics.ListCreateAPIView):
         user = self.request.user
         if user.is_authenticated:
             # Authenticated: see all events
-            return Event.objects.all()
-        return Event.objects.filter(is_public=True)
+            queryset = Event.objects.all()
+        else:
+            queryset = Event.objects.filter(is_public=True)
+        
+        # Filter by category
+        category = self.request.query_params.get('category', None)
+        if category:
+            queryset = queryset.filter(category=category)
+        
+        # Search by name (case-insensitive partial match)
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+        
+        # Filter by date (events starting on a specific date)
+        date = self.request.query_params.get('date', None)
+        if date:
+            queryset = queryset.filter(start_time__date=date)
+        
+        # Filter by date range
+        start_date = self.request.query_params.get('start_date', None)
+        end_date = self.request.query_params.get('end_date', None)
+        if start_date:
+            queryset = queryset.filter(start_time__gte=start_date)
+        if end_date:
+            queryset = queryset.filter(start_time__lte=end_date)
+        
+        return queryset.order_by('start_time')
 
     def perform_create(self, serializer):
         serializer.save(host=self.request.user)
