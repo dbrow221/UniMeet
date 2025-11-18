@@ -10,6 +10,18 @@ const EditEvent = () => {
   const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]); // For location dropdown
 
+  const categoryOptions = [
+    { value: 'sporting', label: 'Sporting' },
+    { value: 'tutoring', label: 'Tutoring' },
+    { value: 'advising', label: 'Advising' },
+    { value: 'social', label: 'Social' },
+    { value: 'academic', label: 'Academic' },
+    { value: 'cultural', label: 'Cultural' },
+    { value: 'volunteering', label: 'Volunteering' },
+    { value: 'career', label: 'Career' },
+    { value: 'other', label: 'Other' },
+  ];
+
   // Fetch event details
   useEffect(() => {
     const fetchEvent = async () => {
@@ -130,6 +142,22 @@ const EditEvent = () => {
             value={eventData.details || ""}
             onChange={handleChange}
           />
+        </label>
+
+        <label>
+          Category:
+          <select
+            name="category"
+            value={eventData.category || "other"}
+            onChange={handleChange}
+            required
+          >
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
