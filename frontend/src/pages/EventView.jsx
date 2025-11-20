@@ -32,6 +32,8 @@ const EventView = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const navigate = useNavigate();
+  const [locations, setLocations] = useState([]); 
+  const [locationFilter, setLocationFilter] = useState("");
 
   const categoryOptions = [
     { value: '', label: 'All Categories' },
@@ -46,6 +48,16 @@ const EventView = () => {
     { value: 'other', label: 'Other' },
   ];
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/locations/")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch locations");
+        return res.json();
+      })
+      .then((data) => setLocations(data))
+      .catch((err) => console.error("Error loading locations:", err));
+  }, []);
+
   const fetchEvents = async () => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
@@ -57,6 +69,7 @@ const EventView = () => {
       if (searchQuery) params.append('search', searchQuery);
       if (categoryFilter) params.append('category', categoryFilter);
       if (dateFilter) params.append('date', dateFilter);
+      if (locationFilter) params.append('location', locationFilter);
 
       const url = `http://127.0.0.1:8000/api/events/${params.toString() ? '?' + params.toString() : ''}`;
       const response = await fetch(url, { headers });
@@ -145,7 +158,7 @@ const EventView = () => {
       }
     }
     fetchEvents();
-  }, [searchQuery, categoryFilter, dateFilter]);
+  }, [searchQuery, categoryFilter, dateFilter, locationFilter]);
 
   // Set up real-time comment polling for expanded event
   useEffect(() => {
@@ -262,6 +275,19 @@ const EventView = () => {
             </option>
           ))}
         </select>
+
+        <select
+          value={locationFilter}
+          onChange={(e) => setLocationFilter(e.target.value)}
+          className="category-filter" // Reusing class for consistent styling
+        >
+          <option value="">All Locations</option>
+          {locations.map((loc) => (
+            <option key={loc.id} value={loc.id}>
+              {loc.name}
+            </option>
+          ))}
+        </select>
         
         <input
           type="date"
@@ -276,6 +302,7 @@ const EventView = () => {
             setSearchQuery("");
             setCategoryFilter("");
             setDateFilter("");
+            setLocationFilter("");
           }}
           className="clear-filters-btn"
         >
