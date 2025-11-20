@@ -7,8 +7,23 @@ export default function FriendSearch() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Fetch friends list on mount
+  useEffect(() => {
+    fetchFriends();
+  }, []);
+
+  const fetchFriends = async () => {
+    try {
+      const response = await api.get('/api/friends/');
+      setFriends(response.data);
+    } catch (err) {
+      console.error('Error fetching friends:', err);
+    }
+  };
 
   // Dynamic search with debounce
   useEffect(() => {
@@ -52,6 +67,26 @@ export default function FriendSearch() {
       console.error("Error sending friend request:", err);
       setMessage(err.response?.data?.detail || "Could not send friend request.");
     }
+  };
+
+  const removeFriend = async (userId) => {
+    if (!confirm("Are you sure you want to remove this friend?")) {
+      return;
+    }
+
+    try {
+      await api.delete(`/api/friends/remove/${userId}/`);
+      setMessage("Friend removed successfully!");
+      // Refresh friends list
+      await fetchFriends();
+    } catch (err) {
+      console.error("Error removing friend:", err);
+      setMessage("Failed to remove friend.");
+    }
+  };
+
+  const isFriend = (userId) => {
+    return friends.some(friend => friend.id === userId);
   };
 
   const getInitials = (username) => {
@@ -100,15 +135,27 @@ export default function FriendSearch() {
                     {user.email && <span className="user-email">{user.email}</span>}
                   </div>
                 </div>
-                <button
-                  className="add-friend-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    sendFriendRequest(user.id);
-                  }}
-                >
-                  + Add Friend
-                </button>
+                {isFriend(user.id) ? (
+                  <button
+                    className="remove-friend-btn-search"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFriend(user.id);
+                    }}
+                  >
+                    Remove Friend
+                  </button>
+                ) : (
+                  <button
+                    className="add-friend-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sendFriendRequest(user.id);
+                    }}
+                  >
+                    + Add Friend
+                  </button>
+                )}
               </li>
             ))}
           </ul>

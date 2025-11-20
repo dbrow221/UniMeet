@@ -119,7 +119,7 @@ const Messages = () => {
         {conversations.length === 0 ? (
           <div className="no-conversations">
             <p>No messages yet</p>
-            <button onClick={() => navigate('/friends/search')} className="start-conversation-btn">
+            <button onClick={() => navigate('/users/search')} className="start-conversation-btn">
               Find Friends to Message
             </button>
           </div>
