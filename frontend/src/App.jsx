@@ -14,6 +14,7 @@ import Profile from './pages/Profile'
 import UserProfile from './pages/UserProfile'
 import EditEvent from "./pages/EditEvent"
 import FriendSearch from './pages/FriendSearch'
+import Messages from './pages/Messages'
 
 function Logout() {
   localStorage.clear()
@@ -54,6 +55,7 @@ function App() {
           <Route path='/user/:userId' element={<UserProfile/>}/>
           <Route path="/events/edit/:id" element={<EditEvent />} />
           <Route path='users/search/' element={<FriendSearch/>}/>
+          <Route path='/messages' element={<Messages/>}/>
 
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />

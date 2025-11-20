@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest
+from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest, Message
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
@@ -261,3 +261,34 @@ class UserSearchSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username"]
+
+
+# --- MESSAGE SERIALIZER ---
+
+class MessageSerializer(serializers.ModelSerializer):
+    """Serializer for direct messages between users."""
+    
+    sender_details = SafeUserSerializer(source="sender", read_only=True)
+    recipient_details = SafeUserSerializer(source="recipient", read_only=True)
+    
+    class Meta:
+        model = Message
+        fields = [
+            "id",
+            "sender",
+            "recipient",
+            "content",
+            "created_at",
+            "read",
+            "read_at",
+            "sender_details",
+            "recipient_details",
+        ]
+        read_only_fields = ["created_at", "read", "read_at", "sender"]
+    
+    def create(self, validated_data):
+        """Ensure the sender is the authenticated user."""
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            validated_data["sender"] = request.user
+        return Message.objects.create(**validated_data)

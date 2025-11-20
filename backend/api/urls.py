@@ -46,4 +46,10 @@ urlpatterns = [
     path("friends/", views.FriendsListView.as_view(), name="friends-list"),
     path("friends/remove/<int:friend_id>/", views.RemoveFriendView.as_view(), name="remove-friend"),
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+    
+    # --- Messaging Endpoints ---
+    path("messages/send/", views.SendMessageView.as_view(), name="send-message"),
+    path("messages/conversations/", views.ConversationListView.as_view(), name="conversation-list"),
+    path("messages/thread/<int:user_id>/", views.MessageThreadView.as_view(), name="message-thread"),
+    path("messages/mark-read/<int:user_id>/", views.MarkMessagesReadView.as_view(), name="mark-messages-read"),
 ]

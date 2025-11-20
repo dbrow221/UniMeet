@@ -450,6 +450,7 @@
 
 .add-friend-button,
 .remove-friend-button,
+.message-button,
 .disabled-button {
   width: 100%;
   padding: 0.85rem 1.5rem;
@@ -469,6 +470,16 @@
 .add-friend-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.message-button {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.message-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
 }
 
 .remove-friend-button {

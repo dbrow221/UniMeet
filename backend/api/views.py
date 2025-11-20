@@ -14,9 +14,9 @@ from .serializers import (
     LocationSerializer,
     ProfileSerializer,
     JoinRequestSerializer,
-    CommentSerializer, FriendRequestSerializer, UserSearchSerializer
+    CommentSerializer, FriendRequestSerializer, UserSearchSerializer, MessageSerializer
 )
-from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest, Friendship
+from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest, Friendship, Message
 
 
 # -------------------------------
@@ -661,3 +661,102 @@ class UserSearchView(generics.ListAPIView):
         if query:
             return User.objects.filter(username__icontains=query).exclude(id=self.request.user.id)
         return User.objects.none()
+
+
+# -------------------------------
+# Messaging
+# -------------------------------
+
+class SendMessageView(generics.CreateAPIView):
+    """Send a message to another user."""
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+
+class ConversationListView(APIView):
+    """Get list of users the current user has conversations with."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Get all users who have sent or received messages from/to current user
+        sent_to = Message.objects.filter(sender=user).values_list('recipient_id', flat=True).distinct()
+        received_from = Message.objects.filter(recipient=user).values_list('sender_id', flat=True).distinct()
+        
+        conversation_user_ids = set(sent_to) | set(received_from)
+        users = User.objects.filter(id__in=conversation_user_ids)
+        
+        # Get last message and unread count for each conversation
+        conversations = []
+        for other_user in users:
+            # Get last message between users
+            last_message = Message.objects.filter(
+                Q(sender=user, recipient=other_user) | Q(sender=other_user, recipient=user)
+            ).order_by('-created_at').first()
+            
+            # Count unread messages from other user
+            unread_count = Message.objects.filter(
+                sender=other_user,
+                recipient=user,
+                read=False
+            ).count()
+            
+            conversations.append({
+                'user': {
+                    'id': other_user.id,
+                    'username': other_user.username
+                },
+                'last_message': {
+                    'content': last_message.content if last_message else '',
+                    'created_at': last_message.created_at if last_message else None,
+                    'sender_id': last_message.sender_id if last_message else None
+                } if last_message else None,
+                'unread_count': unread_count
+            })
+        
+        # Sort by last message time
+        conversations.sort(key=lambda x: x['last_message']['created_at'] if x['last_message'] else '', reverse=True)
+        
+        return Response(conversations)
+
+
+class MessageThreadView(generics.ListAPIView):
+    """Get all messages between current user and another user."""
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        other_user_id = self.kwargs.get('user_id')
+        user = self.request.user
+        
+        # Get messages between the two users
+        messages = Message.objects.filter(
+            Q(sender=user, recipient_id=other_user_id) |
+            Q(sender_id=other_user_id, recipient=user)
+        ).order_by('created_at')
+        
+        return messages
+
+
+class MarkMessagesReadView(APIView):
+    """Mark all messages from a specific user as read."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        from django.utils import timezone
+        
+        messages = Message.objects.filter(
+            sender_id=user_id,
+            recipient=request.user,
+            read=False
+        )
+        
+        count = messages.update(read=True, read_at=timezone.now())
+        
+        return Response({
+            "detail": f"Marked {count} messages as read."
+        }, status=status.HTTP_200_OK)

@@ -26,6 +26,7 @@ function Header() {
 
   {isLoggedIn ? (
     <>
+      <li><Link to="/messages">Messages</Link></li>
       <li><Link to="/profile">Profile</Link></li>
       <li>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>

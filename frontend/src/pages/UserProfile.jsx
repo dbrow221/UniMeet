@@ -169,9 +169,17 @@ function UserProfile() {
         {/* Action buttons based on friendship status */}
         <div className="profile-actions">
           {profile.is_friend ? (
-            <button className="remove-friend-button" onClick={handleRemoveFriend}>
-              Remove Friend
-            </button>
+            <>
+              <button 
+                className="message-button" 
+                onClick={() => navigate(`/messages?userId=${userId}&username=${profile.username}`)}
+              >
+                Send Message
+              </button>
+              <button className="remove-friend-button" onClick={handleRemoveFriend}>
+                Remove Friend
+              </button>
+            </>
           ) : profile.friend_request_status?.startsWith("sent_pending") ? (
             <button className="disabled-button" disabled>
               Friend Request Sent
