@@ -55,6 +55,16 @@
   text-align: center;
 }
 
+/* Small badge for unread message count */
+.inbox-badge-small {
+  background-color: #007bff;
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: bold;
+}
+
 /* Inbox heading */
 .inbox h3 {
   margin: 0 0 15px 0;
@@ -180,6 +190,18 @@
 
 .inbox-btn-deny:hover {
   background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* View Message button */
+.inbox-btn-view {
+  background-color: #007bff;
+  color: white;
+}
+
+.inbox-btn-view:hover {
+  background-color: #0056b3;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
