@@ -10,6 +10,9 @@ const Messages = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -108,6 +111,29 @@ const Messages = () => {
     }
   };
 
+  const handleSearchUsers = async (query) => {
+    setSearchQuery(query);
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await api.get(`/api/users/search/?q=${encodeURIComponent(query)}`);
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error searching users:', error);
+    }
+  };
+
+  const handleStartNewConversation = (user) => {
+    setShowNewMessageModal(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setSelectedUser(user);
+    setMessages([]);
+  };
+
   if (loading) {
     return <div className="messages-loading">Loading messages...</div>;
   }
@@ -115,7 +141,12 @@ const Messages = () => {
   return (
     <div className="messages-container">
       <div className="conversations-sidebar">
-        <h2>Messages</h2>
+        <div className="sidebar-header">
+          <h2>Messages</h2>
+          <button onClick={() => setShowNewMessageModal(true)} className="compose-btn" title="New Message">
+            ✏️ New
+          </button>
+        </div>
         {conversations.length === 0 ? (
           <div className="no-conversations">
             <p>No messages yet</p>
@@ -204,6 +235,45 @@ const Messages = () => {
           </div>
         )}
       </div>
+
+      {/* New Message Modal */}
+      {showNewMessageModal && (
+        <div className="modal-overlay" onClick={() => setShowNewMessageModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>New Message</h3>
+              <button onClick={() => setShowNewMessageModal(false)} className="close-modal-btn">×</button>
+            </div>
+            <div className="modal-body">
+              <input
+                type="text"
+                placeholder="Search for a user..."
+                value={searchQuery}
+                onChange={(e) => handleSearchUsers(e.target.value)}
+                className="user-search-input"
+                autoFocus
+              />
+              <div className="search-results">
+                {searchQuery.trim().length < 2 ? (
+                  <p className="search-hint">Type at least 2 characters to search</p>
+                ) : searchResults.length === 0 ? (
+                  <p className="no-results">No users found</p>
+                ) : (
+                  searchResults.map((user) => (
+                    <div
+                      key={user.id}
+                      className="search-result-item"
+                      onClick={() => handleStartNewConversation(user)}
+                    >
+                      <span className="result-username">{user.username}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -597,3 +597,344 @@ class JoinLogicTests(APITestCase):
         response = self.client.post(url)
         
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class FriendRequestTests(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='user1', password='password')
+        self.user2 = User.objects.create_user(username='user2', password='password')
+        self.user3 = User.objects.create_user(username='user3', password='password')
+    
+    def test_send_friend_request(self):
+        """Test sending a friend request."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('send-friend-request', args=[self.user2.id])
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        from .models import FriendRequest
+        self.assertTrue(FriendRequest.objects.filter(
+            from_user=self.user1, 
+            to_user=self.user2, 
+            status='pending'
+        ).exists())
+    
+    def test_cannot_send_friend_request_to_self(self):
+        """Test that user cannot send friend request to themselves."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('send-friend-request', args=[self.user1.id])
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_accept_friend_request(self):
+        """Test accepting a friend request."""
+        from .models import FriendRequest, Friendship
+        
+        friend_request = FriendRequest.objects.create(
+            from_user=self.user1,
+            to_user=self.user2,
+            status='pending'
+        )
+        
+        self.client.force_authenticate(user=self.user2)
+        url = reverse('accept-friend-request', args=[friend_request.id])
+        response = self.client.put(url, {})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        friend_request.refresh_from_db()
+        self.assertEqual(friend_request.status, 'accepted')
+        
+        # Check friendship was created
+        user_a, user_b = (self.user1, self.user2) if self.user1.id < self.user2.id else (self.user2, self.user1)
+        self.assertTrue(Friendship.objects.filter(user1=user_a, user2=user_b).exists())
+    
+    def test_decline_friend_request(self):
+        """Test declining a friend request."""
+        from .models import FriendRequest
+        
+        friend_request = FriendRequest.objects.create(
+            from_user=self.user1,
+            to_user=self.user2,
+            status='pending'
+        )
+        
+        self.client.force_authenticate(user=self.user2)
+        url = reverse('decline-friend-request', args=[friend_request.id])
+        response = self.client.put(url, {})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        friend_request.refresh_from_db()
+        self.assertEqual(friend_request.status, 'denied')
+    
+    def test_list_received_friend_requests(self):
+        """Test listing received friend requests."""
+        from .models import FriendRequest
+        
+        FriendRequest.objects.create(from_user=self.user1, to_user=self.user2, status='pending')
+        FriendRequest.objects.create(from_user=self.user3, to_user=self.user2, status='pending')
+        
+        self.client.force_authenticate(user=self.user2)
+        url = reverse('received-friend-requests')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+    
+    def test_list_sent_friend_requests(self):
+        """Test listing sent friend requests."""
+        from .models import FriendRequest
+        
+        FriendRequest.objects.create(from_user=self.user1, to_user=self.user2, status='pending')
+        FriendRequest.objects.create(from_user=self.user1, to_user=self.user3, status='pending')
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('sent-friend-requests')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+    
+    def test_list_friends(self):
+        """Test listing friends."""
+        from .models import Friendship
+        
+        # Create friendships
+        user_a, user_b = (self.user1, self.user2) if self.user1.id < self.user2.id else (self.user2, self.user1)
+        Friendship.objects.create(user1=user_a, user2=user_b)
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('friends-list')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+    
+    def test_remove_friend(self):
+        """Test removing a friend."""
+        from .models import Friendship, FriendRequest
+        
+        # Create friendship
+        user_a, user_b = (self.user1, self.user2) if self.user1.id < self.user2.id else (self.user2, self.user1)
+        Friendship.objects.create(user1=user_a, user2=user_b)
+        FriendRequest.objects.create(from_user=self.user1, to_user=self.user2, status='accepted')
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('remove-friend', args=[self.user2.id])
+        response = self.client.delete(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(Friendship.objects.filter(user1=user_a, user2=user_b).exists())
+
+class UserSearchTests(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='alice', password='password')
+        self.user2 = User.objects.create_user(username='bob', password='password')
+        self.user3 = User.objects.create_user(username='charlie', password='password')
+    
+    def test_search_users(self):
+        """Test searching for users."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('user-search')
+        response = self.client.get(url, {'q': 'bob'})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['username'], 'bob')
+    
+    def test_search_users_excludes_self(self):
+        """Test that search results exclude the current user."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('user-search')
+        response = self.client.get(url, {'q': 'alice'})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+    
+    def test_search_users_empty_query(self):
+        """Test search with empty query returns no results."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('user-search')
+        response = self.client.get(url, {'q': ''})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+class MessagingTests(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='sender', password='password')
+        self.user2 = User.objects.create_user(username='recipient', password='password')
+    
+    def test_send_message(self):
+        """Test sending a message."""
+        from .models import Message
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('send-message')
+        data = {
+            'recipient': self.user2.id,
+            'content': 'Hello!'
+        }
+        response = self.client.post(url, data)
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(Message.objects.filter(
+            sender=self.user1,
+            recipient=self.user2,
+            content='Hello!'
+        ).exists())
+    
+    def test_get_conversations_list(self):
+        """Test getting list of conversations."""
+        from .models import Message
+        
+        Message.objects.create(sender=self.user1, recipient=self.user2, content='Hi')
+        Message.objects.create(sender=self.user2, recipient=self.user1, content='Hello')
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('conversation-list')
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['user']['username'], 'recipient')
+    
+    def test_get_message_thread(self):
+        """Test getting message thread with another user."""
+        from .models import Message
+        
+        Message.objects.create(sender=self.user1, recipient=self.user2, content='Message 1')
+        Message.objects.create(sender=self.user2, recipient=self.user1, content='Message 2')
+        Message.objects.create(sender=self.user1, recipient=self.user2, content='Message 3')
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('message-thread', args=[self.user2.id])
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+    
+    def test_mark_messages_as_read(self):
+        """Test marking messages as read."""
+        from .models import Message
+        
+        msg1 = Message.objects.create(sender=self.user2, recipient=self.user1, content='Unread 1')
+        msg2 = Message.objects.create(sender=self.user2, recipient=self.user1, content='Unread 2')
+        
+        self.assertFalse(msg1.read)
+        self.assertFalse(msg2.read)
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('mark-messages-read', args=[self.user2.id])
+        response = self.client.post(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        msg1.refresh_from_db()
+        msg2.refresh_from_db()
+        self.assertTrue(msg1.read)
+        self.assertTrue(msg2.read)
+
+class EventFilteringTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='user', password='password')
+        self.client.force_authenticate(user=self.user)
+        self.location1 = Location.objects.create(name="Library", latitude=10, longitude=10)
+        self.location2 = Location.objects.create(name="Gym", latitude=20, longitude=20)
+        
+        start = timezone.now() + timedelta(hours=1)
+        end = start + timedelta(hours=2)
+        
+        # Create events with different attributes
+        Event.objects.create(
+            name="Study Group",
+            details="Math",
+            host=self.user,
+            location=self.location1,
+            start_time=start,
+            end_time=end,
+            category="academic"
+        )
+        
+        Event.objects.create(
+            name="Basketball Game",
+            details="Sports",
+            host=self.user,
+            location=self.location2,
+            start_time=start + timedelta(days=1),
+            end_time=end + timedelta(days=1),
+            category="sporting"
+        )
+    
+    def test_filter_by_category(self):
+        """Test filtering events by category."""
+        url = reverse('event-list')
+        response = self.client.get(url, {'category': 'academic'})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'Study Group')
+    
+    def test_search_by_name(self):
+        """Test searching events by name."""
+        url = reverse('event-list')
+        response = self.client.get(url, {'search': 'basketball'})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'Basketball Game')
+    
+    def test_filter_by_location(self):
+        """Test filtering events by location."""
+        url = reverse('event-list')
+        response = self.client.get(url, {'location': self.location1.id})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['location_details']['id'], self.location1.id)
+    
+    def test_filter_by_date(self):
+        """Test filtering events by specific date."""
+        url = reverse('event-list')
+        start_date = (timezone.now() + timedelta(hours=1)).date()
+        response = self.client.get(url, {'date': start_date.isoformat()})
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+class UserProfileViewTests(APITestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='user1', password='password')
+        self.user2 = User.objects.create_user(username='user2', password='password')
+        
+        from .models import Profile
+        # Get or create profile (signal may have already created it)
+        self.profile, created = Profile.objects.get_or_create(user=self.user2)
+        self.profile.bio = "Test bio"
+        self.profile.location = "Test location"
+        self.profile.pronouns = "they/them"
+        self.profile.save()
+    
+    def test_get_user_profile(self):
+        """Test getting another user's profile."""
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('get_user_profile', args=[self.user2.id])
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'user2')
+        self.assertEqual(response.data['bio'], 'Test bio')
+        self.assertEqual(response.data['pronouns'], 'they/them')
+    
+    def test_get_user_profile_with_friendship(self):
+        """Test getting profile shows friendship status."""
+        from .models import Friendship
+        
+        user_a, user_b = (self.user1, self.user2) if self.user1.id < self.user2.id else (self.user2, self.user1)
+        Friendship.objects.create(user1=user_a, user2=user_b)
+        
+        self.client.force_authenticate(user=self.user1)
+        url = reverse('get_user_profile', args=[self.user2.id])
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data['is_friend'])

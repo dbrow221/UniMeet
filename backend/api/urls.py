@@ -38,6 +38,7 @@ urlpatterns = [
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 
+
     path("friend-requests/send/<int:to_user_id>/", views.SendFriendRequestView.as_view(), name="send-friend-request"),
     path("friend-requests/received/", views.ReceivedFriendRequestsView.as_view(), name="received-friend-requests"),
     path("friend-requests/sent/", views.SentFriendRequestsView.as_view(), name="sent-friend-requests"),
@@ -46,7 +47,7 @@ urlpatterns = [
     path("friends/", views.FriendsListView.as_view(), name="friends-list"),
     path("friends/remove/<int:friend_id>/", views.RemoveFriendView.as_view(), name="remove-friend"),
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
-    
+
     # --- Messaging Endpoints ---
     path("messages/send/", views.SendMessageView.as_view(), name="send-message"),
     path("messages/conversations/", views.ConversationListView.as_view(), name="conversation-list"),
