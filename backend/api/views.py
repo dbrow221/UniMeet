@@ -65,7 +65,7 @@ class EventListCreate(generics.ListCreateAPIView):
             queryset = queryset.filter(start_time__gte=start_date)
         if end_date:
             queryset = queryset.filter(start_time__lte=end_date)
-
+            
         return queryset.order_by('start_time')
 
     def perform_create(self, serializer):

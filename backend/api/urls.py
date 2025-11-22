@@ -46,4 +46,5 @@ urlpatterns = [
     path("friends/", views.FriendsListView.as_view(), name="friends-list"),
     path("friends/remove/<int:friend_id>/", views.RemoveFriendView.as_view(), name="remove-friend"),
     path("users/search/", views.UserSearchView.as_view(), name="user-search"),
+    path("register/", views.CreateUserView.as_view(), name="register"),
 ]

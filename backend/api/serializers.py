@@ -227,7 +227,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "updated_at",
             "user_details",
         ]
-        read_only_fields = ["created_at", "updated_at", "user"]
+        read_only_fields = ["created_at", "updated_at", "user", "event"]
     
     def create(self, validated_data):
         """Ensure the comment user is the authenticated user."""
