@@ -53,6 +53,11 @@ class EventListCreate(generics.ListCreateAPIView):
         if date:
             queryset = queryset.filter(start_time__date=date)
         
+        # We filter by location__id because the frontend will send the ID
+        location = self.request.query_params.get('location', None)
+        if location:
+            queryset = queryset.filter(location__id=location)
+
         # Filter by date range
         start_date = self.request.query_params.get('start_date', None)
         end_date = self.request.query_params.get('end_date', None)
@@ -60,7 +65,7 @@ class EventListCreate(generics.ListCreateAPIView):
             queryset = queryset.filter(start_time__gte=start_date)
         if end_date:
             queryset = queryset.filter(start_time__lte=end_date)
-        
+            
         return queryset.order_by('start_time')
 
     def perform_create(self, serializer):
@@ -316,6 +321,7 @@ def create_location(request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def location_list(request):
     locations = Location.objects.all()
     serializer = LocationSerializer(locations, many=True)
