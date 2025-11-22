@@ -766,3 +766,60 @@ class MarkMessagesReadView(APIView):
         return Response({
             "detail": f"Marked {count} messages as read."
         }, status=status.HTTP_200_OK)
+
+
+# -------------------------------
+# Notifications
+# -------------------------------
+
+from .models import Notification
+from .serializers import NotificationSerializer
+
+class NotificationListView(generics.ListAPIView):
+    """List all notifications for the current user."""
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+
+class UnreadNotificationCountView(APIView):
+    """Get count of unread notifications."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        count = Notification.objects.filter(user=request.user, is_read=False).count()
+        return Response({"unread_count": count})
+
+
+class MarkNotificationReadView(APIView):
+    """Mark a notification as read."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        from django.utils import timezone
+        
+        notification = get_object_or_404(Notification, pk=pk, user=request.user)
+        notification.is_read = True
+        notification.read_at = timezone.now()
+        notification.save()
+        
+        return Response({"detail": "Notification marked as read."}, status=status.HTTP_200_OK)
+
+
+class MarkAllNotificationsReadView(APIView):
+    """Mark all notifications as read for the current user."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from django.utils import timezone
+        
+        count = Notification.objects.filter(
+            user=request.user,
+            is_read=False
+        ).update(is_read=True, read_at=timezone.now())
+        
+        return Response({
+            "detail": f"Marked {count} notifications as read."
+        }, status=status.HTTP_200_OK)

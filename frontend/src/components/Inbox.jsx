@@ -9,6 +9,7 @@ export default function Inbox() {
   const [joinRequests, setJoinRequests] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [unreadMessages, setUnreadMessages] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,11 +24,12 @@ export default function Inbox() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch join requests, friend requests, and unread messages
-      const [joinResponse, friendResponse, messagesResponse] = await Promise.all([
+      // Fetch join requests, friend requests, unread messages, and notifications
+      const [joinResponse, friendResponse, messagesResponse, notificationsResponse] = await Promise.all([
         api.get("/api/join-requests/"),
         api.get("/api/friend-requests/received/"),
-        api.get("/api/messages/conversations/")
+        api.get("/api/messages/conversations/"),
+        api.get("/api/notifications/")
       ]);
       setJoinRequests(joinResponse.data);
       setFriendRequests(friendResponse.data);
@@ -35,6 +37,10 @@ export default function Inbox() {
       // Filter conversations with unread messages
       const unread = messagesResponse.data.filter(conv => conv.unread_count > 0);
       setUnreadMessages(unread);
+      
+      // Filter unread notifications
+      const unreadNotifications = notificationsResponse.data.filter(notif => !notif.is_read);
+      setNotifications(unreadNotifications);
     } catch (err) {
       console.error("Error fetching requests:", err);
       setError("Failed to load notifications");
@@ -92,7 +98,17 @@ export default function Inbox() {
     return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const totalNotifications = joinRequests.length + friendRequests.length + unreadMessages.length;
+  const handleMarkNotificationRead = async (notificationId) => {
+    try {
+      await api.post(`/api/notifications/${notificationId}/mark-read/`);
+      // Refresh the list after marking as read
+      fetchRequests();
+    } catch (err) {
+      console.error("Error marking notification as read:", err);
+    }
+  };
+
+  const totalNotifications = joinRequests.length + friendRequests.length + unreadMessages.length + notifications.length;
 
   return (
     <>
@@ -140,6 +156,48 @@ export default function Inbox() {
                       }}
                     >
                       View Message
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        
+        {/* Event Reminders Section */}
+        {!loading && !error && notifications.length > 0 && (
+          <div className="inbox-section">
+            <h4 className="inbox-section-title">Event Reminders</h4>
+            <ul className="inbox-list">
+              {notifications.map((notification) => (
+                <li key={`notification-${notification.id}`} className="inbox-item">
+                  <div className="inbox-item-header">
+                    <strong>Event Reminder</strong>
+                    <span className="inbox-item-time">
+                      {formatDate(notification.created_at)}
+                    </span>
+                  </div>
+                  <div className="inbox-item-event">
+                    {notification.message}
+                  </div>
+                  <div className="inbox-item-actions">
+                    {notification.event && (
+                      <button 
+                        className="inbox-btn inbox-btn-view"
+                        onClick={() => {
+                          handleMarkNotificationRead(notification.id);
+                          setIsOpen(false);
+                          navigate(`/events/${notification.event.id}`);
+                        }}
+                      >
+                        View Event
+                      </button>
+                    )}
+                    <button 
+                      className="inbox-btn inbox-btn-deny"
+                      onClick={() => handleMarkNotificationRead(notification.id)}
+                    >
+                      Dismiss
                     </button>
                   </div>
                 </li>

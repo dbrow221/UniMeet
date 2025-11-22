@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest, Message
+from .models import Event, Location, Profile, JoinRequest, Comment, FriendRequest, Message, Notification
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 
@@ -292,3 +292,26 @@ class MessageSerializer(serializers.ModelSerializer):
         if request and hasattr(request, "user"):
             validated_data["sender"] = request.user
         return Message.objects.create(**validated_data)
+
+
+# --- NOTIFICATION SERIALIZER ---
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """Serializer for user notifications."""
+    
+    event_details = EventSerializer(source="event", read_only=True)
+    
+    class Meta:
+        model = Notification
+        fields = [
+            "id",
+            "user",
+            "notification_type",
+            "message",
+            "event",
+            "event_details",
+            "is_read",
+            "created_at",
+            "read_at",
+        ]
+        read_only_fields = ["created_at", "read_at", "user"]

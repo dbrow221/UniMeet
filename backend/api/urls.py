@@ -53,4 +53,10 @@ urlpatterns = [
     path("messages/conversations/", views.ConversationListView.as_view(), name="conversation-list"),
     path("messages/thread/<int:user_id>/", views.MessageThreadView.as_view(), name="message-thread"),
     path("messages/mark-read/<int:user_id>/", views.MarkMessagesReadView.as_view(), name="mark-messages-read"),
+
+    # --- Notification Endpoints ---
+    path("notifications/", views.NotificationListView.as_view(), name="notification-list"),
+    path("notifications/unread-count/", views.UnreadNotificationCountView.as_view(), name="unread-notification-count"),
+    path("notifications/<int:pk>/mark-read/", views.MarkNotificationReadView.as_view(), name="mark-notification-read"),
+    path("notifications/mark-all-read/", views.MarkAllNotificationsReadView.as_view(), name="mark-all-notifications-read"),
 ]
