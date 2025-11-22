@@ -1,4 +1,23 @@
 # UniMeet
+To install the requirements for this app go into the project directory and use the following commands:
+
+            cd backend
+
+            pip install -r requirements.txt
+
+
+# Running the UniMeet App
+To run the UniMeet App, split the terminal, on the first terminal:
+
+            cd backend
+
+            python manage.py runserver
+
+On the second terminal:
+
+            cd frontend
+
+            npm run dev
 
 # Unit Test Instructions
 We use Django's built in test runner combined with Coverage.py to ensure our API is secrure and stable,
