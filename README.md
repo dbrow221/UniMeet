@@ -27,7 +27,7 @@ Make sure you have coverage installed in your environment using the following li
 
             pip install coverage
 
-Make sure you are in UniMeet\backend using:
+Make sure you are in UniMeet\backend using the following line from the project directory:
 
             cd backend
 
