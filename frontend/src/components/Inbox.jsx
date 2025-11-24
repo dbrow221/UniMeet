@@ -33,11 +33,11 @@ export default function Inbox() {
       ]);
       setJoinRequests(joinResponse.data);
       setFriendRequests(friendResponse.data);
-
+      
       // Filter conversations with unread messages
       const unread = messagesResponse.data.filter(conv => conv.unread_count > 0);
       setUnreadMessages(unread);
-
+      
       // Filter unread notifications
       const unreadNotifications = notificationsResponse.data.filter(notif => !notif.is_read);
       setNotifications(unreadNotifications);
@@ -123,15 +123,15 @@ export default function Inbox() {
       {/* Drawer */}
       <div className={`inbox ${isOpen ? "open" : "closed"}`}>
         <h3>Notifications</h3>
-
+        
         {loading && <p className="inbox-status">Loading...</p>}
-
+        
         {error && <p className="inbox-error">{error}</p>}
-
+        
         {!loading && !error && totalNotifications === 0 && (
           <p className="inbox-empty">No new notifications</p>
         )}
-
+        
         {/* Unread Messages Section */}
         {!loading && !error && unreadMessages.length > 0 && (
           <div className="inbox-section">
@@ -163,7 +163,7 @@ export default function Inbox() {
             </ul>
           </div>
         )}
-
+        
         {/* Event Reminders Section */}
         {!loading && !error && notifications.length > 0 && (
           <div className="inbox-section">
@@ -182,7 +182,7 @@ export default function Inbox() {
                   </div>
                   <div className="inbox-item-actions">
                     {notification.event && (
-                      <button
+                      <button 
                         className="inbox-btn inbox-btn-view"
                         onClick={() => {
                           handleMarkNotificationRead(notification.id);
@@ -193,7 +193,7 @@ export default function Inbox() {
                         View Event
                       </button>
                     )}
-                    <button
+                    <button 
                       className="inbox-btn inbox-btn-deny"
                       onClick={() => handleMarkNotificationRead(notification.id)}
                     >
@@ -205,7 +205,7 @@ export default function Inbox() {
             </ul>
           </div>
         )}
-
+        
         {/* Friend Requests Section */}
         {!loading && !error && friendRequests.length > 0 && (
           <div className="inbox-section">
@@ -223,13 +223,13 @@ export default function Inbox() {
                     wants to be your friend
                   </div>
                   <div className="inbox-item-actions">
-                    <button
+                    <button 
                       className="inbox-btn inbox-btn-approve"
                       onClick={() => handleAcceptFriend(request.id)}
                     >
                       Accept
                     </button>
-                    <button
+                    <button 
                       className="inbox-btn inbox-btn-deny"
                       onClick={() => handleDeclineFriend(request.id)}
                     >
@@ -241,7 +241,7 @@ export default function Inbox() {
             </ul>
           </div>
         )}
-
+        
         {/* Join Requests Section */}
         {!loading && !error && joinRequests.length > 0 && (
           <div className="inbox-section">
@@ -259,13 +259,13 @@ export default function Inbox() {
                     wants to join: <strong>{request.event_details.name}</strong>
                   </div>
                   <div className="inbox-item-actions">
-                    <button
+                    <button 
                       className="inbox-btn inbox-btn-approve"
                       onClick={() => handleApprove(request.id)}
                     >
                       Approve
                     </button>
-                    <button
+                    <button 
                       className="inbox-btn inbox-btn-deny"
                       onClick={() => handleDeny(request.id)}
                     >
