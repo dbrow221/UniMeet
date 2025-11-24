@@ -1,7 +1,7 @@
-asgiref 
-Django 
-django-cors-headers 
-djangorestframework 
+asgiref
+Django
+django-cors-headers
+djangorestframework
 djangorestframework-simplejwt
 PyJWT
 pytz
