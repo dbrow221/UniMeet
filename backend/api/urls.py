@@ -14,12 +14,12 @@ urlpatterns = [
     path("events/hosted/", views.HostedEventsView.as_view(), name="hosted-events"),
     path("events/joined/", views.JoinedEventsView.as_view(), name="joined-events"),
     path("events/edit/<int:pk>/", views.EventUpdate.as_view(), name="edit-event"),
-
+    
     # --- Join Request Endpoints ---
     path("join-requests/", views.ListJoinRequestsView.as_view(), name="list-join-requests"),
     path("join-requests/<int:pk>/approve/", views.ApproveJoinRequestView.as_view(), name="approve-join-request"),
     path("join-requests/<int:pk>/deny/", views.DenyJoinRequestView.as_view(), name="deny-join-request"),
-
+    
     # --- Comment Endpoints ---
     path("events/<int:event_id>/comments/", views.EventCommentListCreate.as_view(), name="event-comments"),
 

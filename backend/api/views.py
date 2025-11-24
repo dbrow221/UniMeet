@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied 
 
 from .serializers import (
     UserSerializer,
@@ -37,22 +37,22 @@ class EventListCreate(generics.ListCreateAPIView):
             queryset = Event.objects.all()
         else:
             queryset = Event.objects.filter(is_public=True)
-
+        
         # Filter by category
         category = self.request.query_params.get('category', None)
         if category:
             queryset = queryset.filter(category=category)
-
+        
         # Search by name (case-insensitive partial match)
         search = self.request.query_params.get('search', None)
         if search:
             queryset = queryset.filter(name__icontains=search)
-
+        
         # Filter by date (events starting on a specific date)
         date = self.request.query_params.get('date', None)
         if date:
             queryset = queryset.filter(start_time__date=date)
-
+        
         # We filter by location__id because the frontend will send the ID
         location = self.request.query_params.get('location', None)
         if location:
@@ -65,7 +65,7 @@ class EventListCreate(generics.ListCreateAPIView):
             queryset = queryset.filter(start_time__gte=start_date)
         if end_date:
             queryset = queryset.filter(start_time__lte=end_date)
-
+            
         return queryset.order_by('start_time')
 
     def perform_create(self, serializer):
@@ -383,7 +383,7 @@ def get_user_profile(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         profile = Profile.objects.get(user=user)
-
+        
         # Check if they are friends
         current_user = request.user
         user1, user2 = (current_user, user) if current_user.id < user.id else (user, current_user)

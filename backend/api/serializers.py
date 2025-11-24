@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         """Automatically hashes the password."""
         user = User.objects.create_user(**validated_data)
         return user
-
+    
 class NestedUserSerializer(serializers.ModelSerializer):
     """For updating username/password within ProfileSerializer."""
     class Meta:
@@ -73,7 +73,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     """Handles safe event serialization and creation."""
-
+    
     # Read-only nested details for frontend display
     location_details = LocationSerializer(source="location", read_only=True)
     host_details = SafeUserSerializer(source="host", read_only=True)
