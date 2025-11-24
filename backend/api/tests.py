@@ -11,10 +11,10 @@ class EventBasicTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='testpassword')
         self.client.force_authenticate(user=self.user)
-        
+
         self.location = Location.objects.create(
-            name="Student Union", 
-            latitude=35.3, 
+            name="Student Union",
+            latitude=35.3,
             longitude=-80.7
         )
 
@@ -50,39 +50,39 @@ class EventBasicTests(APITestCase):
         end = start + timedelta(hours=1)
 
         event = Event.objects.create(
-            host=self.user, 
-            location=self.location, 
-            max_capacity=1, 
+            host=self.user,
+            location=self.location,
+            max_capacity=1,
             name="Tiny Event",
-            details="Tiny details", 
+            details="Tiny details",
             start_time=start,
-            end_time=end          
+            end_time=end
         )
-        
+
         other_user = User.objects.create_user(username='other', password='pw')
-        
+
         self.assertFalse(event.is_full())
-        
+
         event.participant_list.add(other_user)
-        
+
         self.assertTrue(event.is_full())
 
     def test_location_filtering(self):
         """Test filtering events by location ID."""
         Event.objects.create(host=self.user, location=self.location, **self.event_data)
-        
+
         library = Location.objects.create(name="Library", latitude=0, longitude=0)
-        
+
         start = timezone.now() + timedelta(hours=1)
         end = start + timedelta(hours=1)
-        
+
         Event.objects.create(
-            host=self.user, 
-            location=library, 
+            host=self.user,
+            location=library,
             name="Library Event",
             details="Read books",
             start_time=start,
-            end_time=end          
+            end_time=end
         )
 
         response = self.client.get(f'/api/events/?location={self.location.id}')
@@ -93,17 +93,17 @@ class EventPermissionTests(APITestCase):
         self.host = User.objects.create_user(username='host', password='password')
         self.attacker = User.objects.create_user(username='attacker', password='password')
         self.location = Location.objects.create(name="Gym", latitude=10, longitude=10)
-        
+
         start = timezone.now() + timedelta(hours=1)
         end = start + timedelta(hours=2)
 
         self.event = Event.objects.create(
             name="Host's Event",
-            details="Host details", 
+            details="Host details",
             host=self.host,
             location=self.location,
             start_time=start,
-            end_time=end  
+            end_time=end
         )
 
     def test_delete_event_as_host(self):
@@ -119,7 +119,7 @@ class EventPermissionTests(APITestCase):
         self.client.force_authenticate(user=self.attacker)
         url = reverse('delete-event', args=[self.event.id])
         response = self.client.delete(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertTrue(Event.objects.filter(id=self.event.id).exists())
 
@@ -128,19 +128,19 @@ class JoinPublicEventTests(APITestCase):
         self.host = User.objects.create_user(username='host', password='password')
         self.guest = User.objects.create_user(username='guest', password='password')
         self.location = Location.objects.create(name="Park", latitude=0, longitude=0)
-        
+
         start = timezone.now() + timedelta(hours=1)
         end = start + timedelta(hours=2)
 
         self.event = Event.objects.create(
             name="Picnic",
-            details="Fun in the sun", 
+            details="Fun in the sun",
             host=self.host,
             location=self.location,
             is_public=True,
             max_capacity=2,
             start_time=start,
-            end_time=end 
+            end_time=end
         )
 
     def test_guest_join_success(self):
@@ -159,8 +159,8 @@ class JoinPublicEventTests(APITestCase):
 
     def test_cannot_double_join(self):
         """User cannot join the same event twice."""
-        self.event.participant_list.add(self.guest) 
-        
+        self.event.participant_list.add(self.guest)
+
         self.client.force_authenticate(user=self.guest)
         url = reverse('join-event', args=[self.event.id])
         response = self.client.post(url)
@@ -171,18 +171,18 @@ class PrivateEventWorkflowTests(APITestCase):
         self.host = User.objects.create_user(username='host', password='pw')
         self.requester = User.objects.create_user(username='requester', password='pw')
         self.location = Location.objects.create(name="Home", latitude=1, longitude=1)
-        
+
         start = timezone.now() + timedelta(hours=1)
         end = start + timedelta(hours=2)
 
         self.private_event = Event.objects.create(
             name="Secret Party",
-            details="Shhh", 
+            details="Shhh",
             host=self.host,
             location=self.location,
-            is_public=False, 
+            is_public=False,
             start_time=start,
-            end_time=end 
+            end_time=end
         )
 
     def test_request_join_private_event(self):
@@ -190,24 +190,24 @@ class PrivateEventWorkflowTests(APITestCase):
         self.client.force_authenticate(user=self.requester)
         url = reverse('request-join-event', args=[self.private_event.id])
         response = self.client.post(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(JoinRequest.objects.filter(
-            user=self.requester, 
-            event=self.private_event, 
+            user=self.requester,
+            event=self.private_event,
             status='pending'
         ).exists())
 
     def test_approve_join_request(self):
         """Test host approving a request."""
         join_req = JoinRequest.objects.create(user=self.requester, event=self.private_event)
-        
+
         self.client.force_authenticate(user=self.host)
         url = reverse('approve-join-request', args=[join_req.id])
         response = self.client.post(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         join_req.refresh_from_db()
         self.assertEqual(join_req.status, 'approved')
         self.assertTrue(self.private_event.participant_list.filter(id=self.requester.id).exists())
@@ -215,13 +215,13 @@ class PrivateEventWorkflowTests(APITestCase):
     def test_deny_join_request(self):
         """Test host denying a request."""
         join_req = JoinRequest.objects.create(user=self.requester, event=self.private_event)
-        
+
         self.client.force_authenticate(user=self.host)
         url = reverse('deny-join-request', args=[join_req.id])
         response = self.client.post(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         join_req.refresh_from_db()
         self.assertEqual(join_req.status, 'denied')
         self.assertFalse(self.private_event.participant_list.filter(id=self.requester.id).exists())
@@ -230,11 +230,11 @@ class PrivateEventWorkflowTests(APITestCase):
         """A random user cannot approve a request for someone else's event."""
         stranger = User.objects.create_user(username='stranger', password='pw')
         join_req = JoinRequest.objects.create(user=self.requester, event=self.private_event)
-        
+
         self.client.force_authenticate(user=stranger)
         url = reverse('approve-join-request', args=[join_req.id])
         response = self.client.post(url)
-        
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 class ValidationTests(APITestCase):
@@ -292,10 +292,10 @@ class ProfileTests(APITestCase):
                 "username": "new_name"
             }
         }
-        
+
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        
+
         self.user.refresh_from_db()
         self.assertEqual(self.user.profile.bio, "New Bio")
         self.assertEqual(self.user.username, "new_name")
@@ -305,7 +305,7 @@ class AdditionalViewsTests(APITestCase):
         self.user = User.objects.create_user(username='user', password='password')
         self.client.force_authenticate(user=self.user)
         self.location = Location.objects.create(name="Gym", latitude=10, longitude=10)
-        
+
         start = timezone.now() + timedelta(hours=1)
         end = start + timedelta(hours=2)
 
