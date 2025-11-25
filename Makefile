@@ -1,7 +1,7 @@
-# ================================
-# UniMeet Automation Makefile (Windows)
-# -------- see note below --------
-# =====================================
+##################################################
+# UniMeet Project Automation (Windows Makefile)
+# -------------- see note below --------------
+##################################################
 
 SHELL := cmd.exe
 
@@ -10,60 +10,62 @@ FRONTEND_DIR = frontend
 BACKEND_DIR = backend
 VENV_DIR = env
 
+# Python paths in virtual environment
 PYTHON = $(VENV_DIR)\Scripts\python
 PIP = $(VENV_DIR)\Scripts\pip
 
-# --------------------------------------------------
+##################################################
 # 1) CREATE PYTHON ENVIRONMENT
-# --------------------------------------------------
+##################################################
 env:
 	python -m venv $(VENV_DIR)
-	@echo Virtual environment created.
+	@echo ✔️ Virtual environment created!
 
-# --------------------------------------------------
-# 2) BACKEND REQUIREMENTS + INSTALLATION
-#     (Auto-creates requirements.txt if missing)
-# --------------------------------------------------
-install-backend: requirements
-	$(PIP) install -r requirements.txt
-	@echo Backend dependencies installed!
-
-requirements:
-	@if not exist requirements.txt ( \
-		echo Creating requirements.txt ... & \
-		$(PIP) install django djangorestframework djangorestframework-simplejwt django-cors-headers python-dotenv psycopg2-binary & \
-		$(PIP) freeze > requirements.txt & \
-		echo requirements.txt created successfully! \
+##################################################
+# 2) BACKEND INSTALLATION (Auto-create requirements.txt if missing)
+##################################################
+install-backend:
+	@if not exist $(BACKEND_DIR)\requirements.txt ( \
+		echo 🛠️ Installing Django backend dependencies... & \
+		cd $(BACKEND_DIR) && $(PIP) install django djangorestframework djangorestframework-simplejwt django-cors-headers python-dotenv psycopg2-binary & \
+		$(PIP) freeze > $(BACKEND_DIR)\requirements.txt & \
+		echo Created $(BACKEND_DIR)\requirements.txt \
 	) else ( \
-		echo requirements.txt found. Skipping creation. \
+		echo Using existing $(BACKEND_DIR)\requirements.txt & \
+		$(PIP) install -r $(BACKEND_DIR)\requirements.txt \
 	)
+	@echo 🎉 Backend ready!
 
-# --------------------------------------------------
-# 3) FRONTEND INSTALLATION & RUN
-# --------------------------------------------------
+##################################################
+# 3) FRONTEND INSTALLATION
+##################################################
 install-frontend:
 	cd $(FRONTEND_DIR) && npm install
+	@echo 🎉 Frontend ready!
 
-run-frontend:
-	cd $(FRONTEND_DIR) && npm run dev
-
-# --------------------------------------------------
-# 4) BACKEND SERVER
-# --------------------------------------------------
+##################################################
+# 4) RUN BACKEND SERVER (Django)
+##################################################
 run-backend:
 	$(VENV_DIR)\Scripts\activate && cd $(BACKEND_DIR) && $(PYTHON) manage.py runserver
 
-# --------------------------------------------------
-# 5) RUN BOTH SERVERS TOGETHER
-# --------------------------------------------------
+##################################################
+# 5) RUN FRONTEND (React/Vite)
+##################################################
+run-frontend:
+	cd $(FRONTEND_DIR) && npm run dev
+
+##################################################
+# 6) RUN BOTH SERVERS TOGETHER
+##################################################
 start-both:
 	cmd /c "start /B make run-backend"
 	cmd /c "start /B make run-frontend"
-	@echo UniMeet is running! 🎉
+	@echo 🚀 UniMeet is now running (backend + frontend)!
 
-# --------------------------------------------------
-# 6) CLEAN ENVIRONMENT
-# --------------------------------------------------
+##################################################
+# 7) DELETE VIRTUAL ENV
+##################################################
 clean:
 	rmdir /S /Q $(VENV_DIR)
 	@echo Virtual environment deleted!
@@ -82,13 +84,13 @@ clean:
 
 
 # First-Time Setup (Run Only Once)
-# 1️Create Python virtual environment
+# 1️) Create Python virtual environment
 # make env
 
-# 2️Install backend dependencies (Django, JWT, etc.)
+# 2️) Install backend dependencies (Django, JWT, etc.)
 # make install-backend
 
-# 3️Install frontend dependencies (React/Vite)
+# 3️) Install frontend dependencies (React/Vite)
 # make install-frontend
 
 # Run the Project (Backend + Frontend)
