@@ -47,7 +47,8 @@ install-frontend:
 # 4) RUN BACKEND SERVER (Django)
 ##################################################
 run-backend:
-	$(VENV_DIR)\Scripts\activate && cd $(BACKEND_DIR) && $(PYTHON) manage.py runserver
+run-backend:
+	cmd /c "$(VENV_DIR)\Scripts\python.exe backend\manage.py runserver"
 
 ##################################################
 # 5) RUN FRONTEND (React/Vite)
