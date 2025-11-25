@@ -1,11 +1,12 @@
-import axios from "axios"
-import { ACCESS_TOKEN } from "./constants"
-
+import axios from "axios";
+import { ACCESS_TOKEN } from "./constants";
 
 const api = axios.create({
-baseURL: import.meta.env.VITE_API_URL
-
-})
+  baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000",
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
 
 api.interceptors.request.use(
   (config) => {
@@ -20,4 +21,4 @@ api.interceptors.request.use(
   }
 );
 
-export default api
+export default api;
