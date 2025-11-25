@@ -14,14 +14,14 @@ PYTHON = $(VENV_DIR)\Scripts\python
 PIP = $(VENV_DIR)\Scripts\pip
 
 # --------------------------------------------------
-# 🧱 1) CREATE PYTHON ENVIRONMENT
+# 1) CREATE PYTHON ENVIRONMENT
 # --------------------------------------------------
 env:
 	python -m venv $(VENV_DIR)
 	@echo Virtual environment created.
 
 # --------------------------------------------------
-# 📌 2) BACKEND REQUIREMENTS + INSTALLATION
+# 2) BACKEND REQUIREMENTS + INSTALLATION
 #     (Auto-creates requirements.txt if missing)
 # --------------------------------------------------
 install-backend: requirements
@@ -39,7 +39,7 @@ requirements:
 	)
 
 # --------------------------------------------------
-# 🌐 3) FRONTEND INSTALLATION & RUN
+# 3) FRONTEND INSTALLATION & RUN
 # --------------------------------------------------
 install-frontend:
 	cd $(FRONTEND_DIR) && npm install
@@ -48,13 +48,13 @@ run-frontend:
 	cd $(FRONTEND_DIR) && npm run dev
 
 # --------------------------------------------------
-# 🚀 4) BACKEND SERVER
+# 4) BACKEND SERVER
 # --------------------------------------------------
 run-backend:
 	$(VENV_DIR)\Scripts\activate && cd $(BACKEND_DIR) && $(PYTHON) manage.py runserver
 
 # --------------------------------------------------
-# 🚀 5) RUN BOTH SERVERS TOGETHER
+# 5) RUN BOTH SERVERS TOGETHER
 # --------------------------------------------------
 start-both:
 	cmd /c "start /B make run-backend"
@@ -62,7 +62,7 @@ start-both:
 	@echo UniMeet is running! 🎉
 
 # --------------------------------------------------
-# 🧹 6) CLEAN ENVIRONMENT
+# 6) CLEAN ENVIRONMENT
 # --------------------------------------------------
 clean:
 	rmdir /S /Q $(VENV_DIR)
